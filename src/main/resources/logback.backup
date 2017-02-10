@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <logger name="uk.ac.ebi.spot.biosamples" level="INFO" />
+    <logger name="org.springframework" level="INFO" />
+    <logger name="org.springframework.test" level="INFO" />
+</configuration>

@@ -17,19 +17,29 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.spot.biosamples.Model.Sample;
+import uk.ac.ebi.spot.biosamples.Model.SamplesIterator;
 import uk.ac.ebi.spot.biosamples.Model.SamplesRelation;
+import uk.ac.ebi.spot.biosamples.Service.SamplesIteratorService;
+import uk.ac.ebi.spot.biosamples.Service.SamplesService;
+import uk.ac.ebi.spot.biosamples.Service.xml.SampleToEntryConverter;
+import uk.ac.ebi.spot.biosamples.Service.xml.XmlUtilities;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static uk.ac.ebi.spot.biosamples.Service.ApiSupport.getSamples;
 
 @SpringBootApplication
 public class Application {
 
     @Autowired
-    private RestTemplate restTempalte;
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private SamplesService samplesService;
+
+    @Autowired private SamplesIteratorService samplesIteratorService;
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
@@ -44,9 +54,13 @@ public class Application {
 	public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
 		return args -> {
 
-			Collection<Sample> samples = getSamples(restTemplate);
-			String url = "http://www.ebi.ac.uk/biosamples/api/samplesrelations/SAMEA2629457/derivedTo";
-			readRelation(restTemplate,url);
+			SamplesIterator iterator = samplesIteratorService.getSamplesIterator();
+			List<Resource<Sample>> samples = Stream.generate(iterator::next).limit(100).collect(Collectors.toList());
+			for(Resource<Sample> sample: samples) {
+			    Element entry = SampleToEntryConverter.produceEntryFor(sample.getContent());
+			    log.info(XmlUtilities.prettyPrint(entry));
+            }
+
 
 //			List<Element> entries = new ArrayList<>();
 //			samples.forEach(sample -> {

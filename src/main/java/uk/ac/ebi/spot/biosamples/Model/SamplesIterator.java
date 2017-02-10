@@ -11,10 +11,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-//@Component
-public class SamplesIterator implements Iterator<Resource<Sample>>{
+public class SamplesIterator implements Iterator<Resource<Sample>> {
 
-//    @Autowired
     private RestTemplate restTemplate;
     private static final String DEFAULT_URL = "https://www.ebi.ac.uk/biosamples/api/samples/";
     private String baseUrl;
@@ -22,17 +20,19 @@ public class SamplesIterator implements Iterator<Resource<Sample>>{
     private Iterator<Resource<Sample>> currentCollectionIterator;
 
 
-    public SamplesIterator(String baseUrl) throws HttpStatusCodeException{
-       this.baseUrl = baseUrl;
-       try {
-           updatePageStatusWith(baseUrl);
-       } catch (HttpStatusCodeException e) {
-           throw e;
-       }
+    public SamplesIterator(RestTemplate restTemplate, String baseUrl) throws HttpStatusCodeException {
+
+        this.restTemplate = restTemplate;
+        this.baseUrl = baseUrl;
+        try {
+            updatePageStatusWith(baseUrl);
+        } catch (HttpStatusCodeException e) {
+            throw e;
+        }
     }
 
-    public SamplesIterator() {
-        this(DEFAULT_URL);
+    public SamplesIterator(RestTemplate restTemplate) {
+        this(restTemplate, DEFAULT_URL);
     }
 
     private PagedResources<Resource<Sample>> getNextSamplesPage(String url) throws HttpStatusCodeException {
@@ -40,15 +40,17 @@ public class SamplesIterator implements Iterator<Resource<Sample>>{
                 url,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<PagedResources<Resource<Sample>>>(){});
-        if(re.getStatusCode().is2xxSuccessful()) {
+                new ParameterizedTypeReference<PagedResources<Resource<Sample>>>() {
+                });
+        if (re.getStatusCode().is2xxSuccessful()) {
             return re.getBody();
         } else {
-            throw new HttpStatusCodeException(re.getStatusCode()){};
+            throw new HttpStatusCodeException(re.getStatusCode()) {
+            };
         }
     }
 
-    private void updatePageStatusWith(String url) throws HttpStatusCodeException{
+    private void updatePageStatusWith(String url) throws HttpStatusCodeException {
         this.currentPage = getNextSamplesPage(baseUrl);
         this.currentCollectionIterator = this.currentPage.getContent().iterator();
     }
