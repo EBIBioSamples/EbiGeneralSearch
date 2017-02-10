@@ -42,6 +42,25 @@ public class Application {
 		SpringApplication.run(Application.class);
 	}
 
+	@Bean MappingJackson2HttpMessageConverter createHalConverter() {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.registerModule(new Jackson2HalModule());
+		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+		converter.setSupportedMediaTypes(MediaType.parseMediaTypes("application/hal+json"));
+		converter.setObjectMapper(mapper);
+
+		return converter;
+	}
+
+	@Bean
+	public RestTemplate restTemplate(RestTemplateBuilder builder) {
+
+        builder = builder.additionalMessageConverters(createHalConverter());
+		return builder.build();
+
+	}
+
 	@Bean
 	public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
 		return args -> {

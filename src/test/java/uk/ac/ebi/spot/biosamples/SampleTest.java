@@ -143,7 +143,15 @@ public class SampleTest {
         assertThat(deriveTo).isNotEmpty();
         Collection<String> deriveToSamplesRelation = deriveTo.getContent().stream().map(SamplesRelation::getAccession).collect(Collectors.toList());
         assertThat(deriveToSamplesRelation).contains("SAMEA2672925", "SAMEA2590900", "SAMEA2590887").withFailMessage("Sample is missing some deriveTo relations");
-
-
     }
+
+//    public void getFirstSamplesPage() {
+//        SamplesIterator it = new SamplesIterator();
+//        assertThat(!it.getStatus().hasLink("prev")).withFailMessage("First sample page should not have a prev page");
+//    }
+//
+//    public void getLastSamplesPage() {
+//        SamplesIterator lastPageIterator = new SamplesIterator("https://www.ebi.ac.uk/biosamples/api/samples?page=106771&size=50");
+//        assertThat(!lastPageIterator.getStatus().hasLink("next")).withFailMessage("Last sample page should not have a next page");
+//    }
 }

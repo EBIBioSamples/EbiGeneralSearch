@@ -1,48 +1,78 @@
 package uk.ac.ebi.spot.biosamples.Model;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
+import java.util.NoSuchElementException;
 
-@Component
-public class SamplesIterator implements Iterator<Sample>{
+//@Component
+public class SamplesIterator implements Iterator<Resource<Sample>>{
 
-    @Autowired
-    RestTemplate restTemplate;
-
+//    @Autowired
+    private RestTemplate restTemplate;
     private static final String DEFAULT_URL = "https://www.ebi.ac.uk/biosamples/api/samples/";
-    private String baseUrl, currentUrl;
-    private List<Sample> currentCollection;
+    private String baseUrl;
+    private PagedResources<Resource<Sample>> currentPage;
+    private Iterator<Resource<Sample>> currentCollectionIterator;
 
 
-    public SamplesIterator(String baseUrl) {
+    public SamplesIterator(String baseUrl) throws HttpStatusCodeException{
        this.baseUrl = baseUrl;
-       this.currentUrl = baseUrl;
-       this.currentCollection = getNextSamplesBatch();
-
+       try {
+           updatePageStatusWith(baseUrl);
+       } catch (HttpStatusCodeException e) {
+           throw e;
+       }
     }
 
     public SamplesIterator() {
         this(DEFAULT_URL);
     }
 
-    private List<Sample> getNextSamplesBatch() {
-        ResponseEntity
-        Collection<Sample>
+    private PagedResources<Resource<Sample>> getNextSamplesPage(String url) throws HttpStatusCodeException {
+        ResponseEntity<PagedResources<Resource<Sample>>> re = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<PagedResources<Resource<Sample>>>(){});
+        if(re.getStatusCode().is2xxSuccessful()) {
+            return re.getBody();
+        } else {
+            throw new HttpStatusCodeException(re.getStatusCode()){};
+        }
     }
 
+    private void updatePageStatusWith(String url) throws HttpStatusCodeException{
+        this.currentPage = getNextSamplesPage(baseUrl);
+        this.currentCollectionIterator = this.currentPage.getContent().iterator();
+    }
 
     @Override
     public boolean hasNext() {
-        return false;
+        return this.currentCollectionIterator.hasNext() || this.currentPage.hasLink("next");
     }
 
     @Override
-    public Sample next() {
-        return null;
+    public Resource<Sample> next() {
+        if (this.currentCollectionIterator.hasNext()) {
+            return this.currentCollectionIterator.next();
+        } else {
+            if (this.currentPage.hasLink("next")) {
+                updatePageStatusWith(this.currentPage.getNextLink().getHref());
+                return this.currentCollectionIterator.next();
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+    }
+
+    public PagedResources<Resource<Sample>> getStatus() {
+        return this.currentPage;
     }
 }
