@@ -1,40 +1,37 @@
 package uk.ac.ebi.spot.biosamples;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-import uk.ac.ebi.spot.biosamples.Model.SamplesRelation;
 import uk.ac.ebi.spot.biosamples.Model.Sample;
+import uk.ac.ebi.spot.biosamples.Model.SamplesRelation;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static uk.ac.ebi.spot.biosamples.Service.ApiSupport.*;
+import static uk.ac.ebi.spot.biosamples.Service.ApiSupport.getSamples;
 
 @SpringBootApplication
 public class Application {
 
-    private static final Logger log = LoggerFactory.getLogger(Application.class);
+    @Autowired
+    private RestTemplate restTempalte;
 
+    private static final Logger log = LoggerFactory.getLogger(Application.class);
 
 	private static final List<String> wantedRelations = Arrays.asList("derivedTo", "derivedFrom", "groups");
 
@@ -42,24 +39,6 @@ public class Application {
 		SpringApplication.run(Application.class);
 	}
 
-	@Bean MappingJackson2HttpMessageConverter createHalConverter() {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		mapper.registerModule(new Jackson2HalModule());
-		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-		converter.setSupportedMediaTypes(MediaType.parseMediaTypes("application/hal+json"));
-		converter.setObjectMapper(mapper);
-
-		return converter;
-	}
-
-	@Bean
-	public RestTemplate restTemplate(RestTemplateBuilder builder) {
-
-        builder = builder.additionalMessageConverters(createHalConverter());
-		return builder.build();
-
-	}
 
 	@Bean
 	public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
