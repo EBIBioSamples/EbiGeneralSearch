@@ -1,6 +1,6 @@
 package uk.ac.ebi.spot.biosamples.Model;
 
-public class SamplesRelation{
+public class BioSampleRelation {
     private String accession;
 
     public String getAccession() {

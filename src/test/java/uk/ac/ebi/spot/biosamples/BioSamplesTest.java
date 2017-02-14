@@ -14,8 +14,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.spot.biosamples.Model.Sample;
-import uk.ac.ebi.spot.biosamples.Model.SamplesRelation;
-import uk.ac.ebi.spot.biosamples.Service.SamplesIteratorService;
+import uk.ac.ebi.spot.biosamples.Model.BioSampleRelation;
+import uk.ac.ebi.spot.biosamples.Service.BiosampleIteratorService;
 import uk.ac.ebi.spot.biosamples.Service.SamplesService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,13 +25,13 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class,
         initializers = ConfigFileApplicationContextInitializer.class)
-public class SampleTest {
+public class BioSamplesTest {
 
     @Autowired
     private RestTemplate restTemplate;
 
     @Autowired
-    private SamplesIteratorService samplesIteratorService;
+    private BiosampleIteratorService samplesIteratorService;
 
     @Autowired private SamplesService samplesService;
 
@@ -56,22 +56,22 @@ public class SampleTest {
 
     @Test
     public void relationIsEmpty() {
-            ResponseEntity<PagedResources<Resource<SamplesRelation>>> re = restTemplate.exchange(
+            ResponseEntity<PagedResources<Resource<BioSampleRelation>>> re = restTemplate.exchange(
                     emptySampleRelations,
                     HttpMethod.GET,
                     null,
-                    new ParameterizedTypeReference<PagedResources<Resource<SamplesRelation>>>(){});
+                    new ParameterizedTypeReference<PagedResources<Resource<BioSampleRelation>>>(){});
             assertTrue("Response must be 200", re.getStatusCode().is2xxSuccessful());
             assertTrue("Content should be empty", re.getBody().getContent().isEmpty());
     }
 
     @Test
     public void relationIsNotEmpty() {
-        ResponseEntity<Resources<Resource<SamplesRelation>>> re = restTemplate.exchange(
+        ResponseEntity<Resources<Resource<BioSampleRelation>>> re = restTemplate.exchange(
                 nonEmptySampleRelation,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<Resources<Resource<SamplesRelation>>>(){});
+                new ParameterizedTypeReference<Resources<Resource<BioSampleRelation>>>(){});
         assertTrue("Response Status Code should be 200", re.getStatusCode().is2xxSuccessful());
         assertNotNull("Content should not be null",re.getBody());
         assertTrue("Content should not be empty", !re.getBody().getContent().isEmpty());
@@ -80,18 +80,19 @@ public class SampleTest {
     @Test
     public void groupRelationNotEmpty() {
         String groupUrl = "https://www.ebi.ac.uk/biosamples/api/samplesrelations/SAME1422202/groups";
-        ResponseEntity<Resources<Resource<SamplesRelation>>> re = restTemplate.exchange(
+        ResponseEntity<Resources<Resource<BioSampleRelation>>> re = restTemplate.exchange(
                 groupUrl,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<Resources<Resource<SamplesRelation>>>(){});
+                new ParameterizedTypeReference<Resources<Resource<BioSampleRelation>>>(){});
         assertTrue("Response Status Code should be 200", re.getStatusCode().is2xxSuccessful());
         assertNotNull("Content should not be null",re.getBody());
         assertTrue("Content should not be empty", !re.getBody().getContent().isEmpty());
-        SamplesRelation rel = re.getBody().getContent().stream().findFirst().get().getContent();
+        BioSampleRelation rel = re.getBody().getContent().stream().findFirst().get().getContent();
         assertThat(rel.getAccession()).isEqualTo("SAMEG159724");
 
     }
+
 
 
 

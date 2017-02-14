@@ -16,10 +16,10 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import uk.ac.ebi.spot.biosamples.Model.BioSamplesIterator;
 import uk.ac.ebi.spot.biosamples.Model.Sample;
-import uk.ac.ebi.spot.biosamples.Model.SamplesIterator;
-import uk.ac.ebi.spot.biosamples.Model.SamplesRelation;
-import uk.ac.ebi.spot.biosamples.Service.SamplesIteratorService;
+import uk.ac.ebi.spot.biosamples.Model.BioSampleRelation;
+import uk.ac.ebi.spot.biosamples.Service.BiosampleIteratorService;
 import uk.ac.ebi.spot.biosamples.Service.SamplesService;
 import uk.ac.ebi.spot.biosamples.Service.xml.SampleToEntryConverter;
 import uk.ac.ebi.spot.biosamples.Service.xml.XmlUtilities;
@@ -39,7 +39,7 @@ public class Application {
     @Autowired
     private SamplesService samplesService;
 
-    @Autowired private SamplesIteratorService samplesIteratorService;
+    @Autowired private BiosampleIteratorService samplesIteratorService;
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
@@ -54,7 +54,7 @@ public class Application {
 	public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
 		return args -> {
 
-			SamplesIterator iterator = samplesIteratorService.getSamplesIterator();
+			BioSamplesIterator<Sample> iterator = samplesIteratorService.getSamplesIterator();
 			List<Resource<Sample>> samples = Stream.generate(iterator::next).limit(100).collect(Collectors.toList());
 			for(Resource<Sample> sample: samples) {
 			    Element entry = SampleToEntryConverter.produceEntryFor(sample.getContent());
@@ -92,27 +92,27 @@ public class Application {
 	}
 
 
-	private List<SamplesRelation> getSampleRelations(RestTemplate restTemplate, String relationLink) {
-        ResponseEntity<Resource<SamplesRelation>> re = restTemplate.exchange(
+	private List<BioSampleRelation> getSampleRelations(RestTemplate restTemplate, String relationLink) {
+        ResponseEntity<Resource<BioSampleRelation>> re = restTemplate.exchange(
                 relationLink,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<Resource<SamplesRelation>>(){});
+                new ParameterizedTypeReference<Resource<BioSampleRelation>>(){});
         if (re.getStatusCode().is2xxSuccessful()) {
             List<Link> filteredLinks = re.getBody().getLinks().stream().filter(type -> wantedRelations.contains(type.getRel())).collect(Collectors.toList());
             for(Link link: filteredLinks) {
-                Collection<Resource<SamplesRelation>> outRelations = readRelation(restTemplate, link.getHref());
+                Collection<Resource<BioSampleRelation>> outRelations = readRelation(restTemplate, link.getHref());
             }
         }
         return null;
     }
 
-	private Collection<Resource<SamplesRelation>> readRelation(RestTemplate restTemplate, String relationLink) {
-        ResponseEntity<PagedResources<Resource<SamplesRelation>>> re = restTemplate.exchange(
+	private Collection<Resource<BioSampleRelation>> readRelation(RestTemplate restTemplate, String relationLink) {
+        ResponseEntity<PagedResources<Resource<BioSampleRelation>>> re = restTemplate.exchange(
                 relationLink,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<PagedResources<Resource<SamplesRelation>>>(){});
+                new ParameterizedTypeReference<PagedResources<Resource<BioSampleRelation>>>(){});
         if (re.getStatusCode().is2xxSuccessful()) {
             if(re.getBody().getContent() == null) {
                 log.info("Occhio");

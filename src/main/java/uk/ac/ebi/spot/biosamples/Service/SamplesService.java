@@ -18,17 +18,18 @@ public class SamplesService {
     private RestTemplate restTemplate;
 
     @Value("${biosamples.api.root:'http://www.ebi.ac.uk/biosamples/api/}")
-    private String baseUrl;
+    private String apiRoot;
+
 
     public Sample getSample(String id) {
 
-        String url = "{baseUrl}/samples/{id}";
+        String url = "{apiRoot}/samples/{id}";
         ResponseEntity<Resource<Sample>> re = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<Resource<Sample>>() {},
-                baseUrl, id);
+                apiRoot, id);
         if (re.getStatusCode().is2xxSuccessful()) {
             Resource<Sample> resourceSample = re.getBody();
             return resourceSample.getContent();

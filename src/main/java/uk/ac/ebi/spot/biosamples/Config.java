@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootConfiguration
 public class Config {
 
+
     @Bean
     MappingJackson2HttpMessageConverter createHalConverter() {
         ObjectMapper mapper = new ObjectMapper();

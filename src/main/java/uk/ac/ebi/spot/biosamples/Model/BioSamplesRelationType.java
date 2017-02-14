@@ -1,6 +1,6 @@
 package uk.ac.ebi.spot.biosamples.Model;
 
-public enum SamplesRelationType {
+public enum BioSamplesRelationType {
     RECURATED_TO("recuratedTo"), PARENT_OF("parentOf"),
     EXTERNAL_LINKS("externalLinks"), DERIVED_TO("derivedTo"),
     DERIVED_FROM("derivedFrom"), RECURATED_FROM("recuratedFrom"),
@@ -8,7 +8,7 @@ public enum SamplesRelationType {
 
 
     private String rel;
-    SamplesRelationType(String relName) {
+    BioSamplesRelationType(String relName) {
         this.rel = relName;
     }
 
