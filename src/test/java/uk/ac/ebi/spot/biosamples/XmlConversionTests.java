@@ -2,10 +2,7 @@ package uk.ac.ebi.spot.biosamples;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.output.DOMOutputter;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -15,20 +12,14 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Node;
-import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
-import org.xmlunit.diff.DefaultNodeMatcher;
-import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.ElementSelector;
-import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.xpath.JAXPXPathEngine;
 import org.xmlunit.xpath.XPathEngine;
 import uk.ac.ebi.spot.biosamples.Model.Entities.Sample;
 import uk.ac.ebi.spot.biosamples.Service.BioSamplesIteratorService;
 import uk.ac.ebi.spot.biosamples.Service.SamplesResourceService;
 import uk.ac.ebi.spot.biosamples.Service.XmlService;
-import uk.ac.ebi.spot.biosamples.XmlUnitExtensions.NodeFilters;
-import uk.ac.ebi.spot.biosamples.XmlUnitExtensions.NodeMatchers.FieldNodeMatcher;
 
 import javax.xml.transform.Source;
 import java.io.File;
@@ -83,23 +74,24 @@ public class XmlConversionTests {
         );
 
         org.w3c.dom.Document w3cDoc = null;
-        org.w3c.dom.Document w3cManualTestDoc = null;
-        try {
-            w3cDoc = new DOMOutputter().output(doc);
-            w3cManualTestDoc = new DOMOutputter().output(manualTestDoc);
-        } catch (JDOMException e) {
-            e.printStackTrace();
-        }
+//        org.w3c.dom.Document w3cManualTestDoc = null;
+//        try {
+//            w3cDoc = new DOMOutputter().output(doc);
+//            w3cManualTestDoc = new DOMOutputter().output(manualTestDoc);
+//        } catch (JDOMException e) {
+//            e.printStackTrace();
+//        }
 
 
         sampleSource = Input.fromString(xmlService.prettyPrint(sampleEntry)).build();
-        documentSource = Input.fromDocument(w3cDoc).build();
-        manualTestDocumentSource = Input.fromDocument(w3cManualTestDoc).build();
         testSource = Input.fromFile(testFile).build();
+        
+//        documentSource = Input.fromDocument(w3cDoc).build();
+//        manualTestDocumentSource = Input.fromDocument(w3cManualTestDoc).build();
 
-        selector = ElementSelectors.conditionalBuilder()
-                .whenElementIsNamed("field").thenUse(new FieldNodeMatcher())
-                .build();
+//        selector = ElementSelectors.conditionalBuilder()
+//                .whenElementIsNamed("field").thenUse(new FieldNodeMatcher())
+//                .build();
     }
 
     @Test
@@ -130,29 +122,29 @@ public class XmlConversionTests {
         assertThat(updateDate).isNotEmpty().isEqualTo(testSample.getUpdateDate());
     }
 
-    @Test
-    @Ignore
-    public void compareEntries() {
-
-        Diff diff = DiffBuilder.compare(manualTestDocumentSource)
-                .withTest(testSource)
-                .checkForSimilar()
-                .ignoreWhitespace()
-                .normalizeWhitespace()
-                .withNodeFilter(new NodeFilters())
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndAllAttributes))
-                .build();
-        try {
-            assertThat(diff.hasDifferences())
-                    .as("Check build and test document aren't different")
-                    .isFalse();
-        } catch (AssertionError e) {
-            diff.getDifferences().forEach(d -> {
-                log.warn("A difference has been found:\n"+d.toString());
-            });
-            throw e;
-        }
-    }
+//    @Test
+//    @Ignore
+//    public void compareEntries() {
+//
+//        Diff diff = DiffBuilder.compare(manualTestDocumentSource)
+//                .withTest(testSource)
+//                .checkForSimilar()
+//                .ignoreWhitespace()
+//                .normalizeWhitespace()
+//                .withNodeFilter(new NodeFilters())
+//                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndAllAttributes))
+//                .build();
+//        try {
+//            assertThat(diff.hasDifferences())
+//                    .as("Check build and test document aren't different")
+//                    .isFalse();
+//        } catch (AssertionError e) {
+//            diff.getDifferences().forEach(d -> {
+//                log.warn("A difference has been found:\n"+d.toString());
+//            });
+//            throw e;
+//        }
+//    }
 
 
 }

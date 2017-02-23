@@ -10,12 +10,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.spot.biosamples.Model.Entities.BioSamplesIterator;
 import uk.ac.ebi.spot.biosamples.Model.Entities.Sample;
@@ -30,7 +25,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -74,6 +72,8 @@ public class Application {
 	public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
 		return args -> {
 
+		    long startTime = System.currentTimeMillis();
+
 			BioSamplesIterator<Sample> iterator = samplesResourceService.getSamplesIterator();
 			List<Resource<Sample>> samples = Stream.generate(iterator::next).limit(50).collect(Collectors.toList());
             ExecutorService executor = null;
@@ -82,7 +82,6 @@ public class Application {
                 List<CompletableFuture<Resource<Sample>>> futList = new ArrayList<>();
                 for(Resource<Sample> sample: samples) {
                     futList.add(CompletableFuture.supplyAsync(new Supplier<Resource<Sample>>() {
-//                        private final Resource<Sample> sample ;
                         @Override
                         public Resource<Sample> get() {
                             Map<BioSamplesRelationType, List<BioSamplesRelation>> relations = relationsService.getSampleRelations(sample.getContent().getAccession());
@@ -111,37 +110,8 @@ public class Application {
                }
             }
 
-            System.out.println("Finished");
-
-
-
-
-
-
-
-////			List<CompletableFuture<Resource<Sample>>> cfs = samples.stream()
-////                    .map(sample -> CompletableFuture.supplyAsync( () -> {
-////
-////                    },executor))
-////                    .collect(Collectors.toList());
-//            CompletableFuture<Void> allDoneFuture = CompletableFuture.allOf(cfs.toArray(new CompletableFuture[cfs.size()]));
-//
-////            CompletableFuture<List<Resource<Sample>>> allDone = sequence(cfs);
-////
-////            allDone.then(resources -> {
-//                List<Element> entries = resources.stream()
-//                        .map(res -> xmlService.getEntryForSample(res.getContent()))
-//                        .collect(Collectors.toList());
-//                Document doc = xmlService.produceDocumentForEntries(entries);
-//                Path path = Paths.get(this.getClass().getResource("/").getPath(),"output.xml");
-//                try {
-//                    writeFile(doc,path);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                return null;
-////            }).join();
-
+            long endTime = System.currentTimeMillis();
+            System.out.println(String.format("Finished in %d millis",endTime - startTime ));
 		};
 	}
 
@@ -150,48 +120,6 @@ public class Application {
 	    writer.write(xmlService.prettyPrint(doc));
 	    writer.close();
     }
-
-    private static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> futures) {
-        CompletableFuture<Void> allDoneFuture =
-                CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
-        return allDoneFuture.thenApply(v ->
-                futures.stream().
-                        map(future -> future.join()).
-                        collect(Collectors.<T>toList())
-        );
-    }
-
-	private List<BioSamplesRelation> getSampleRelations(RestTemplate restTemplate, String relationLink) {
-        ResponseEntity<Resource<BioSamplesRelation>> re = restTemplate.exchange(
-                relationLink,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<Resource<BioSamplesRelation>>(){});
-        if (re.getStatusCode().is2xxSuccessful()) {
-            List<Link> filteredLinks = re.getBody().getLinks().stream().filter(type -> wantedRelations.contains(type.getRel())).collect(Collectors.toList());
-            for(Link link: filteredLinks) {
-                Collection<Resource<BioSamplesRelation>> outRelations = readRelation(restTemplate, link.getHref());
-            }
-        }
-        return null;
-    }
-
-	private Collection<Resource<BioSamplesRelation>> readRelation(RestTemplate restTemplate, String relationLink) {
-        ResponseEntity<PagedResources<Resource<BioSamplesRelation>>> re = restTemplate.exchange(
-                relationLink,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<PagedResources<Resource<BioSamplesRelation>>>(){});
-        if (re.getStatusCode().is2xxSuccessful()) {
-            if(re.getBody().getContent() == null) {
-                log.info("Occhio");
-            }
-            return re.getBody().getContent();
-
-        }
-        return Collections.emptyList();
-    }
-
 
 	
 }
