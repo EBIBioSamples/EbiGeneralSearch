@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<database>
+    <name>biosamples</name>
+    <description></description>
+    <release>1</release>
+    <release_date>04-11-2016</release_date>
+    <entry_count>1</entry_count>
+    <entries>
+        <entry id="SAME44348">
+            <name>GM05914</name>
+            <description>MAJOR AFFECTIVE DISORDER; OLD ORDER AMISH - 125480 OR
+                309200</description>
+            <dates>
+                <date type="release" value="2012-04-30"></date>
+                <date type="update" value="2016-11-03"></date>
+            </dates>
+            <additional_fields>
+                <field name="content_type">samples</field>
+                <field name="species">Homo Sapiens</field>
+                <field name="material">cell line</field>
+                <field name="organism_part">blood</field>
+                <field name="cell_type">B-Lymphocyte</field>
+                <field name="disease_state">MANIC-DEPRESSIVE PSYCHOSIS, AUTOSOMAL</field>
+                <field name="sex">male</field>
+                <field name="transformation_type">Epstein-Barr Virus</field>
+                <field name="submission_title">Coriell Cell Repositories - NIGMS Human Genetic
+                    Cell Repository</field>
+                <field name="submission_id">GCR-nigms</field>
+                <field name="curator_organization">EBI</field>
+                <field name="submitter_organization">Coriell Institute</field>
+                <field name="age">23</field>
+                <field name="clinical_history">Clinically normal; 4 sibs with type I bipolar
+                    illness; son of GM05993A and GM05995B; see GM05915 Fibroblast</field>
+                <field name="clinically_affected_status">No</field>
+                <field name="collection">NIGMS Human Genetic Cell Repository</field>
+                <field name="ethnicity">Caucasian</field>
+                <field name="geographic_origin">AMISH</field>
+            </additional_fields>
+            <cross_references>
+                <ref dbname="TAXONOMY" dbkey="9606"/>
+                <ref dbname="TAXONOMY" dbkey="10376"/>
+                <ref dbname="CL" dbkey="CL_0000236"/>
+                <ref dbname="EFO" dbkey="EFO_0000352"/>
+                <ref dbname="EFO" dbkey="EFO_0003156"/>
+                <ref dbname="EFO" dbkey="EFO_0000322"/>
+                <ref dbname="IDOMAL" dbkey="IDOMAL_0000702"/>
+                <ref dbname="ANCESTRO" dbkey="ancestro_0316"/>
+                <ref dbname="UBERON" dbkey="UBERON_0000178"/>
+                <ref dbname="PATO" dbkey="PATO_0000384"/>
+                <ref dbname="SAMPLES" dbkey="SAME586651"/>
+            </cross_references>
+        </entry>
+    </entries>
+</database>

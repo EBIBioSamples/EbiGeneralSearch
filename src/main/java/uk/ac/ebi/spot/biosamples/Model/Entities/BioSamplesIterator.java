@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.biosamples.Model;
+package uk.ac.ebi.spot.biosamples.Model.Entities;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.PagedResources;
@@ -10,14 +10,16 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import uk.ac.ebi.spot.biosamples.Service.RelationsService;
 
 import java.net.URI;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class BioSamplesIterator<E> implements Iterator<Resource<E>> {
+public class BioSamplesIterator<E extends BioSamplesEntity> implements Iterator<Resource<E>> {
 
     private RestTemplate restTemplate;
+    private RelationsService relationsService;
     private URI baseUrl;
     private PagedResources<Resource<E>> currentPage;
     private ParameterizedTypeReference<PagedResources<Resource<E>>> parameterizedTypeReference;
@@ -25,7 +27,10 @@ public class BioSamplesIterator<E> implements Iterator<Resource<E>> {
     private Boolean initialized;
 
 
-    public BioSamplesIterator(RestTemplate restTemplate, URI baseUrl, ParameterizedTypeReference<PagedResources<Resource<E>>> type) {
+    public BioSamplesIterator(RestTemplate restTemplate,
+                              RelationsService relationsService,
+                              URI baseUrl,
+                              ParameterizedTypeReference<PagedResources<Resource<E>>> type) {
 
         assert(baseUrl != null);
         assert(restTemplate != null);
@@ -33,6 +38,7 @@ public class BioSamplesIterator<E> implements Iterator<Resource<E>> {
         this.baseUrl = baseUrl;
         this.parameterizedTypeReference = type;
         this.initialized = false;
+        this.relationsService = relationsService;
     }
 
     public void initialize() throws HttpStatusCodeException, UnsupportedOperationException{
@@ -79,10 +85,11 @@ public class BioSamplesIterator<E> implements Iterator<Resource<E>> {
 
         if (this.currentCollectionIterator.hasNext()) {
             return this.currentCollectionIterator.next();
+//            return getExtendedResource(nextResource);
         } else {
             if (this.currentPage.hasLink("next")) {
                 updateStatusWith(URI.create(this.currentPage.getNextLink().getHref()));
-                return this.currentCollectionIterator.next();
+                return this.next();
             } else {
                 throw new NoSuchElementException();
             }
@@ -92,6 +99,26 @@ public class BioSamplesIterator<E> implements Iterator<Resource<E>> {
     public PagedResources<Resource<E>> getStatus() {
         return this.currentPage;
     }
+
+//    public Resource<E> getExtendedResource(Resource<E> originalResource) {
+//        E content = originalResource.getContent();
+//        Map<BioSamplesRelationType, List<Relation>> relations = null;
+//        if (content.getEntityType().equals(Group.class)) {
+//            relations = relationsService.getGroupsRelations(content.getAccession());
+//        } else if (content.getEntityType().equals(Sample.class)) {
+//            relations = relationsService.getSampleRelations(content.getAccession());
+//        }
+//
+//        if(relations  != null) {
+//           content.setRelations(relations);
+//           return new Resource<>(content,originalResource.getLinks());
+//        } else {
+//            return originalResource;
+//        }
+//
+//
+//
+//    }
 
 
 

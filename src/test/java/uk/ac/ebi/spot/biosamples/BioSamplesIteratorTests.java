@@ -7,10 +7,10 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.hateoas.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.spot.biosamples.Model.BioSamplesIterator;
-import uk.ac.ebi.spot.biosamples.Model.Group;
-import uk.ac.ebi.spot.biosamples.Model.Sample;
-import uk.ac.ebi.spot.biosamples.Service.BiosampleIteratorService;
+import uk.ac.ebi.spot.biosamples.Model.Entities.BioSamplesIterator;
+import uk.ac.ebi.spot.biosamples.Model.Entities.Group;
+import uk.ac.ebi.spot.biosamples.Model.Entities.Sample;
+import uk.ac.ebi.spot.biosamples.Service.BioSamplesIteratorService;
 
 import java.util.List;
 import java.util.Set;
@@ -22,10 +22,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Application.class,
         initializers = ConfigFileApplicationContextInitializer.class)
-public class BioSamplesIteratorTest {
+public class BioSamplesIteratorTests {
 
     @Autowired
-    private BiosampleIteratorService service;
+    private BioSamplesIteratorService service;
 
     @Test
     public void getFirstSamplesPage() {

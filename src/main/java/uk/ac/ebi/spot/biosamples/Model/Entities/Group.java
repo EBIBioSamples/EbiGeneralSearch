@@ -1,24 +1,20 @@
-package uk.ac.ebi.spot.biosamples.Model;
+package uk.ac.ebi.spot.biosamples.Model.Entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import uk.ac.ebi.spot.biosamples.Model.Util.CharacteristicsDeserializer;
+import uk.ac.ebi.spot.biosamples.Model.Relations.BioSamplesRelation;
+import uk.ac.ebi.spot.biosamples.Model.Relations.BioSamplesRelationType;
 
 import java.util.List;
+import java.util.Map;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Sample {
+public class Group implements BioSamplesEntity {
 
     private String accession;
     private String name;
     private String description;
     private String updateDate;
     private String releaseDate;
-
-
-    @JsonDeserialize(using = CharacteristicsDeserializer.class)
-    private List<BioSamplesCharacteristic> characteristics;
-
+    private List<String> samples;
+    private Map<BioSamplesRelationType, List<BioSamplesRelation>> relations;
 
 
     public String getAccession() {
@@ -57,16 +53,29 @@ public class Sample {
         return releaseDate;
     }
 
+    @Override
+    public Map<BioSamplesRelationType, List<BioSamplesRelation>> getRelations() {
+        return this.relations;
+    }
+
+    @Override
+    public Class getEntityType() {
+        return Group.class;
+    }
+
+    public void setRelations(Map<BioSamplesRelationType, List<BioSamplesRelation>> relations) {
+        this.relations = relations;
+    }
+
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    public List<BioSamplesCharacteristic> getCharacteristics() {
-        return characteristics;
+    public List<String> getSamples() {
+        return samples;
     }
 
-    public void setCharacteristics(List<BioSamplesCharacteristic> characteristics) {
-        this.characteristics = characteristics;
+    public void setSamples(List<String> samples) {
+        this.samples = samples;
     }
-
 }

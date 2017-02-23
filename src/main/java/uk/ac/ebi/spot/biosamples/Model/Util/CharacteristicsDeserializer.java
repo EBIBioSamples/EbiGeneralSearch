@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.ebi.spot.biosamples.Model.BioSamplesCharacteristic;
+import uk.ac.ebi.spot.biosamples.Model.Entities.BioSamplesCharacteristic;
 
 import java.io.IOException;
 import java.util.ArrayList;
