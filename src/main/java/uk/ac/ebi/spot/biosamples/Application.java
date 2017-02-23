@@ -50,9 +50,6 @@ public class Application {
     @Autowired
     private SamplesResourceService samplesResourceService;
 
-//    @Autowired
-//	private BioSamplesIteratorService samplesIteratorService;
-
     @Autowired
 	private XmlService xmlService;
 

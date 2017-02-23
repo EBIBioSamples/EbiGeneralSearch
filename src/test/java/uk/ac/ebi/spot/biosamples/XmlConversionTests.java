@@ -3,6 +3,7 @@ package uk.ac.ebi.spot.biosamples;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration( classes = Application.class, initializers = ConfigFileApplicationContextInitializer.class)
+@Ignore
 //@SpringBootTest
 public class XmlConversionTests {
 

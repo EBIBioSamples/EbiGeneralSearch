@@ -1,5 +1,7 @@
 package uk.ac.ebi.spot.biosamples.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -7,20 +9,28 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.UriTemplate;
 import org.springframework.hateoas.client.Traverson;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import uk.ac.ebi.spot.biosamples.Model.Entities.BioSamplesEntity;
+import uk.ac.ebi.spot.biosamples.Model.Entities.Group;
+import uk.ac.ebi.spot.biosamples.Model.Entities.Sample;
 import uk.ac.ebi.spot.biosamples.Model.Relations.BioSamplesRelation;
 import uk.ac.ebi.spot.biosamples.Model.Relations.BioSamplesRelationType;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static uk.ac.ebi.spot.biosamples.Model.Relations.BioSamplesRelationType.values;
 
 @Service
 public class RelationsService {
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private RestTemplate restTemplate;
@@ -30,12 +40,45 @@ public class RelationsService {
 
     public Map<BioSamplesRelationType, List<BioSamplesRelation>> getSampleRelations(String accession) {
         Map<BioSamplesRelationType, List<BioSamplesRelation>> sampleRelations = new HashMap<>();
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("apiRoot", apiRoot);
-        parameters.put("accession", accession);
-        UriTemplate template = new UriTemplate("{apiRoot}/samples/{accession}");
 
-        Traverson traverson = new Traverson(template.expand(parameters), MediaTypes.HAL_JSON);
+        try {
+            sampleRelations = getAllRelationAsync(accession, Sample.class).get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Error while retrieving relations for " + accession, e);
+        }
+        return sampleRelations;
+
+    }
+
+    public Map<BioSamplesRelationType, List<BioSamplesRelation>> getGroupsRelations(String accession) {
+
+        try {
+            return getAllRelationAsync(accession, Group.class).get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Error while retrieving relations for " + accession, e);
+        }
+        return new HashMap<>();
+
+    }
+
+    @Async
+    public CompletableFuture<List<BioSamplesRelation>> getRelationTypeAsync(String accession,
+                                                                            Class<? extends BioSamplesEntity> entity,
+                                                                            BioSamplesRelationType type) {
+        Traverson traverson = getTraverson(accession, entity);
+        ParameterizedTypeReference<Resources<BioSamplesRelation>> relation = new ParameterizedTypeReference<Resources<BioSamplesRelation>>() {};
+        Resources<BioSamplesRelation> ir = traverson.follow("relations",type.getRelationName()).toObject(relation);
+        List<BioSamplesRelation> relations = ir.getContent().stream().collect(Collectors.toList());
+
+        return CompletableFuture.completedFuture(relations);
+
+    }
+
+    @Async
+    public CompletableFuture<Map<BioSamplesRelationType,List<BioSamplesRelation>>> getAllRelationAsync(String accession,
+                                                                                                    Class<? extends BioSamplesEntity> entity) {
+        Map<BioSamplesRelationType, List<BioSamplesRelation>> sampleRelations = new HashMap<>();
+        Traverson traverson = getTraverson(accession, entity);
         ParameterizedTypeReference<Resources<BioSamplesRelation>> relation =
                 new ParameterizedTypeReference<Resources<BioSamplesRelation>>() {};
         for(BioSamplesRelationType e: values()) {
@@ -43,27 +86,23 @@ public class RelationsService {
             sampleRelations.put(e, ir.getContent().stream().collect(Collectors.toList()));
         }
 
-        return sampleRelations;
+        return CompletableFuture.completedFuture(sampleRelations);
 
     }
 
-    public Map<BioSamplesRelationType, List<BioSamplesRelation>> getGroupsRelations(String accession) {
-        Map<BioSamplesRelationType, List<BioSamplesRelation>> groupRelations = new HashMap<>();
+
+    private Traverson getTraverson(String accession, Class<? extends BioSamplesEntity> type) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("apiRoot", apiRoot);
         parameters.put("accession", accession);
-        UriTemplate template = new UriTemplate("{apiRoot}/groups/{accession}");
-
-        Traverson traverson = new Traverson(template.expand(parameters), MediaTypes.HAL_JSON);
-        ParameterizedTypeReference<Resources<BioSamplesRelation>> rel = new ParameterizedTypeReference<Resources<BioSamplesRelation>>() {};
-        for(BioSamplesRelationType e: values()) {
-            Resources<BioSamplesRelation> relations = traverson.follow("relations",e.getRelationName()).toObject(rel);
-            if(!relations.getContent().isEmpty()) {
-                groupRelations.put(e, relations.getContent().stream().collect(Collectors.toList()));
-            }
+        UriTemplate template = null;
+        if(type == Sample.class) {
+            template = new UriTemplate("{apiRoot}/samples/{accession}");
+        } else {
+            template = new UriTemplate("{apiRoot}/groups/{accession}");
         }
 
-        return groupRelations;
+        return new Traverson(template.expand(parameters), MediaTypes.HAL_JSON);
     }
 
 

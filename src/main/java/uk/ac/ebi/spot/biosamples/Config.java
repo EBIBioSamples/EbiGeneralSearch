@@ -12,9 +12,11 @@ import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootConfiguration
+@EnableAsync
 public class Config {
 
     private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 100;
@@ -54,8 +56,5 @@ public class Config {
         connectionManager.setMaxTotal(DEFAULT_MAX_TOTAL_CONNECTIONS);
         return defaultHttpClient;
     }
-
-
-
 
 }
