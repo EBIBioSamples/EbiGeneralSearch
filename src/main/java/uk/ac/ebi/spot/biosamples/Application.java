@@ -72,7 +72,7 @@ public class Application {
 		    long startTime = System.currentTimeMillis();
 
 			BioSamplesIterator<Sample> iterator = samplesResourceService.getSamplesIterator();
-			List<Resource<Sample>> samples = Stream.generate(iterator::next).limit(50).collect(Collectors.toList());
+			List<Resource<Sample>> samples = Stream.generate(iterator::next).limit(10).collect(Collectors.toList());
             ExecutorService executor = null;
             try {
                 executor = Executors.newFixedThreadPool(16);

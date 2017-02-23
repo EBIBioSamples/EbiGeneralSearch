@@ -183,7 +183,7 @@ public class XmlService {
                     String taxonID = uriMatcher.group();
                     Matcher taxonMatcher = Pattern.compile(taxonRegexp).matcher(taxonID);
                     if (taxonMatcher.find()) {
-                        String taxonomy = taxonMatcher.group();
+                        String taxonomy = taxonMatcher.group(1);
                         String dbName = taxonomy.toUpperCase();
                         if (taxonomy.equals("NCBITaxon")) {
                             dbName = "TAXONOMY";
