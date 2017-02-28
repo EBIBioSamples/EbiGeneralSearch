@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.biosamples;
+package uk.ac.ebi.biosamples;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,10 +7,10 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.hateoas.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.spot.biosamples.Model.Entities.BioSamplesIterator;
-import uk.ac.ebi.spot.biosamples.Model.Entities.Group;
-import uk.ac.ebi.spot.biosamples.Model.Entities.Sample;
-import uk.ac.ebi.spot.biosamples.Service.BioSamplesIteratorService;
+import uk.ac.ebi.biosamples.Model.Entities.Group;
+import uk.ac.ebi.biosamples.Model.Entities.BioSamplesIterator;
+import uk.ac.ebi.biosamples.Model.Entities.Sample;
+import uk.ac.ebi.biosamples.Service.BioSamplesIteratorService;
 
 import java.util.List;
 import java.util.Set;

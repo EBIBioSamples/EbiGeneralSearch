@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.biosamples.Model.Relations;
+package uk.ac.ebi.biosamples.Model.Relations;
 
 public enum BioSamplesRelationType {
     RECURATED_TO("recuratedTo"),

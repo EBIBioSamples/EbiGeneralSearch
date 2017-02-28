@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.biosamples;
+package uk.ac.ebi.biosamples;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

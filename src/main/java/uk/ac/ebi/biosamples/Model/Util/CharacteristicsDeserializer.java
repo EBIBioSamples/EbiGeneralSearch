@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.biosamples.Model.Util;
+package uk.ac.ebi.biosamples.Model.Util;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.ebi.spot.biosamples.Model.Entities.BioSamplesCharacteristic;
+import uk.ac.ebi.biosamples.Model.Entities.BioSamplesCharacteristic;
 
 import java.io.IOException;
 import java.util.ArrayList;

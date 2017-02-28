@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.biosamples.Service;
+package uk.ac.ebi.biosamples.Service;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -6,11 +6,11 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.spot.biosamples.Model.Entities.BioSamplesCharacteristic;
-import uk.ac.ebi.spot.biosamples.Model.Entities.Group;
-import uk.ac.ebi.spot.biosamples.Model.Entities.Sample;
-import uk.ac.ebi.spot.biosamples.Model.Relations.BioSamplesRelation;
-import uk.ac.ebi.spot.biosamples.Model.Relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.Model.Entities.BioSamplesCharacteristic;
+import uk.ac.ebi.biosamples.Model.Entities.Group;
+import uk.ac.ebi.biosamples.Model.Entities.Sample;
+import uk.ac.ebi.biosamples.Model.Relations.BioSamplesRelation;
+import uk.ac.ebi.biosamples.Model.Relations.BioSamplesRelationType;
 
 import java.text.SimpleDateFormat;
 import java.util.*;

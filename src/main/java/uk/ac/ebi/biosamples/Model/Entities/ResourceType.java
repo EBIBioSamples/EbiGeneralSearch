@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.biosamples.Model.Entities;
+package uk.ac.ebi.biosamples.Model.Entities;
 
 public enum ResourceType {
     GROUPS("groups"), SAMPLES_RELATIONS("samplesrelations"),

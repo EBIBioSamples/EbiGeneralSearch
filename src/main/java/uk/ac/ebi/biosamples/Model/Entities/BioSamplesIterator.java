@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.biosamples.Model.Entities;
+package uk.ac.ebi.biosamples.Model.Entities;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.PagedResources;
@@ -10,7 +10,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import uk.ac.ebi.spot.biosamples.Service.RelationsService;
+import uk.ac.ebi.biosamples.Service.RelationsService;
 
 import java.net.URI;
 import java.util.Iterator;
