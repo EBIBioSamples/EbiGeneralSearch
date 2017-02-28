@@ -7,10 +7,10 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.hateoas.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.biosamples.Model.Entities.Group;
-import uk.ac.ebi.biosamples.Model.Entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.Model.Entities.Sample;
-import uk.ac.ebi.biosamples.Service.BioSamplesIteratorService;
+import uk.ac.ebi.biosamples.model.Entities.Group;
+import uk.ac.ebi.biosamples.model.Entities.BioSamplesIterator;
+import uk.ac.ebi.biosamples.model.Entities.Sample;
+import uk.ac.ebi.biosamples.service.BioSamplesIteratorService;
 
 import java.util.List;
 import java.util.Set;

@@ -1,18 +1,20 @@
-package uk.ac.ebi.biosamples.Runners;
+package uk.ac.ebi.biosamples.runners;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
-import uk.ac.ebi.biosamples.Model.Entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.Model.Entities.Sample;
-import uk.ac.ebi.biosamples.Model.Relations.BioSamplesRelation;
-import uk.ac.ebi.biosamples.Model.Relations.BioSamplesRelationType;
-import uk.ac.ebi.biosamples.Service.RelationsService;
-import uk.ac.ebi.biosamples.Service.SamplesResourceService;
-import uk.ac.ebi.biosamples.Service.XmlService;
+import uk.ac.ebi.biosamples.model.Entities.BioSamplesIterator;
+import uk.ac.ebi.biosamples.model.Entities.Sample;
+import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.service.RelationsService;
+import uk.ac.ebi.biosamples.service.SamplesResourceService;
+import uk.ac.ebi.biosamples.service.XmlService;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -31,24 +33,32 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
+@Order
 public class FixedLengthRunner implements CommandLineRunner {
 
-    @Autowired
+    private Logger log = LoggerFactory.getLogger(FixedLengthRunner.class);
+
+    private XmlService xmlService;
+    private SamplesResourceService samplesService;
     private RelationsService relationsService;
 
-    @Autowired
-    private SamplesResourceService samplesResourceService;
-
-    @Autowired
-    private XmlService xmlService;
+    public FixedLengthRunner(XmlService xmlService,
+                             RelationsService relationsService,
+                             SamplesResourceService samplesService)
+    {
+          this.relationsService = relationsService;
+          this.xmlService = xmlService;
+          this.samplesService = samplesService;
+    }
 
     @Override
-    public void run(String... strings) throws Exception {
+    public void run(String... args) throws Exception {
 
-
+        log.info("Started FixedLengthRunner application");
         long startTime = System.currentTimeMillis();
 
-        BioSamplesIterator<Sample> iterator = samplesResourceService.getSamplesIterator();
+
+        BioSamplesIterator<Sample> iterator = samplesService.getSamplesIterator();
         List<Resource<Sample>> samples = Stream.generate(iterator::next).limit(10).collect(Collectors.toList());
         ExecutorService executor = null;
         try {
@@ -85,7 +95,7 @@ public class FixedLengthRunner implements CommandLineRunner {
         }
 
         long endTime = System.currentTimeMillis();
-        System.out.println(String.format("Finished in %d millis",endTime - startTime ));
+        log.info(String.format("Finished FixedLengthRunner in %d millis",endTime - startTime ));
     }
 
 
@@ -95,4 +105,5 @@ public class FixedLengthRunner implements CommandLineRunner {
         writer.write(xmlService.prettyPrint(doc));
         writer.close();
     }
+
 }

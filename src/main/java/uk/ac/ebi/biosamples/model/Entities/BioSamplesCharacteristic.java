@@ -1,4 +1,4 @@
-package uk.ac.ebi.biosamples.Model.Entities;
+package uk.ac.ebi.biosamples.model.Entities;
 
 import java.util.Collections;
 import java.util.List;

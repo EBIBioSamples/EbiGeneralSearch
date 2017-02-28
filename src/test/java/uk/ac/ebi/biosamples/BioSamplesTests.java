@@ -13,12 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
-import uk.ac.ebi.biosamples.Model.Relations.BioSamplesRelationType;
-import uk.ac.ebi.biosamples.Model.Entities.Sample;
-import uk.ac.ebi.biosamples.Model.Relations.BioSamplesRelation;
-import uk.ac.ebi.biosamples.Service.BioSamplesIteratorService;
-import uk.ac.ebi.biosamples.Service.RelationsService;
-import uk.ac.ebi.biosamples.Service.SamplesResourceService;
+import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.model.Entities.Sample;
+import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelation;
+import uk.ac.ebi.biosamples.service.BioSamplesIteratorService;
+import uk.ac.ebi.biosamples.service.RelationsService;
+import uk.ac.ebi.biosamples.service.SamplesResourceService;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,4 +1,4 @@
-package uk.ac.ebi.biosamples.Service;
+package uk.ac.ebi.biosamples.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +12,11 @@ import org.springframework.hateoas.client.Traverson;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uk.ac.ebi.biosamples.Model.Entities.Group;
-import uk.ac.ebi.biosamples.Model.Relations.BioSamplesRelationType;
-import uk.ac.ebi.biosamples.Model.Entities.BioSamplesEntity;
-import uk.ac.ebi.biosamples.Model.Entities.Sample;
-import uk.ac.ebi.biosamples.Model.Relations.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.Entities.Group;
+import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.model.Entities.BioSamplesEntity;
+import uk.ac.ebi.biosamples.model.Entities.Sample;
+import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelation;
 
 import java.util.HashMap;
 import java.util.List;

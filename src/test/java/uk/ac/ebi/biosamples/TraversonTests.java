@@ -10,7 +10,7 @@ import org.springframework.hateoas.UriTemplate;
 import org.springframework.hateoas.client.Traverson;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.biosamples.Model.Relations.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelation;
 
 import java.net.URISyntaxException;
 import java.util.Collection;

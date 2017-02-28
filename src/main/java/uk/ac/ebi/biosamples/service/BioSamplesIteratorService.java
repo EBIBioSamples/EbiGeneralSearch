@@ -1,4 +1,4 @@
-package uk.ac.ebi.biosamples.Service;
+package uk.ac.ebi.biosamples.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,9 +7,9 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uk.ac.ebi.biosamples.Model.Entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.Model.Entities.Group;
-import uk.ac.ebi.biosamples.Model.Entities.Sample;
+import uk.ac.ebi.biosamples.model.Entities.BioSamplesIterator;
+import uk.ac.ebi.biosamples.model.Entities.Group;
+import uk.ac.ebi.biosamples.model.Entities.Sample;
 
 import java.net.URI;
 
