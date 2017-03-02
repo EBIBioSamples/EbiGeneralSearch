@@ -9,10 +9,10 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.model.entities.Sample;
-import uk.ac.ebi.biosamples.model.enums.EntityType;
 import uk.ac.ebi.biosamples.model.entities.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.model.enums.EntityType;
 import uk.ac.ebi.biosamples.model.util.ExecutionInfo;
 import uk.ac.ebi.biosamples.model.util.RunnerOptions;
 import uk.ac.ebi.biosamples.service.RelationsService;
@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -78,7 +77,7 @@ public class BufferedFutureRunner implements ApplicationRunner {
         BioSamplesIterator<Sample> bioSamplesIterator = samplesResourceService.getSamplesIterator(uriBuilder.build());
 
 
-        Path path = Paths.get(this.getClass().getResource("/").getPath(), options.getFilename());
+        Path path = options.getFilename();
         ExecutorService executor = null;
         Duration maxDuration = Duration.ofMinutes(60);
         Temporal start = Instant.now();

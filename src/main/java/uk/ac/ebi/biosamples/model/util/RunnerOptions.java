@@ -2,13 +2,16 @@ package uk.ac.ebi.biosamples.model.util;
 
 import org.springframework.boot.ApplicationArguments;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class RunnerOptions {
     private final int DEFAULT_SIZE = 1000;
     private final int DEFAULT_PAGE = 0;
-    private final String DEFAULT_FILENAME = "output.xml";
+    private final Path DEFAULT_FILENAME = Paths.get("./output.xml");
     int size;
     int startPage;
-    String filename;
+    Path filename;
 
     private RunnerOptions(ApplicationArguments args) {
         this.size = args.containsOption("size") ?
@@ -18,7 +21,7 @@ public class RunnerOptions {
                 Integer.parseInt(args.getOptionValues("page").get(0),10) :
                 DEFAULT_PAGE;
         this.filename = args.containsOption("filename") ?
-                args.getOptionValues("filename").get(0) :
+                Paths.get(args.getOptionValues("filename").get(0)):
                 DEFAULT_FILENAME;
     }
 
@@ -30,7 +33,7 @@ public class RunnerOptions {
         return startPage;
     }
 
-    public String getFilename() {
+    public Path getFilename() {
         return filename;
     }
 
