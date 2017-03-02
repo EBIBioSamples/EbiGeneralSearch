@@ -3,9 +3,9 @@ package uk.ac.ebi.biosamples.model.util;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ExecutionInfo {
-    private AtomicInteger submitted;
-    private AtomicInteger completed;
-    private AtomicInteger error;
+    private final AtomicInteger submitted;
+    private final AtomicInteger completed;
+    private final AtomicInteger error;
 
     public ExecutionInfo() {
         submitted = new AtomicInteger(0);
@@ -15,18 +15,15 @@ public class ExecutionInfo {
 
 
     public void incrementSubmitted(int value) {
-        int oldValue = submitted.get();
-        submitted.set(oldValue + value);
+        submitted.getAndAdd(value);
     }
 
     public void incrementCompleted(int value) {
-        int oldValue = completed.get();
-        completed.set(oldValue + value);
+        completed.getAndAdd(value);
     }
 
     public void incrementError(int value) {
-        int oldValue = error.get();
-        error.set(oldValue + value);
+        error.getAndAdd(value);
     }
 
     public int getCompleted() {
