@@ -2,5 +2,6 @@ biosamples.api.page.size = 50
 biosamples.api.root      = https://www.ebi.ac.uk/biosamples/api
 
 # Error handling information
-resource.max.error       = 2
+resource.max.error       = 10
+connection.timeout       = 10
 
