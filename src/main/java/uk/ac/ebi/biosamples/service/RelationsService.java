@@ -15,8 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.biosamples.model.entities.BioSamplesEntity;
 import uk.ac.ebi.biosamples.model.entities.Group;
 import uk.ac.ebi.biosamples.model.entities.Sample;
-import uk.ac.ebi.biosamples.model.relations.BioSamplesRelation;
-import uk.ac.ebi.biosamples.model.relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.model.entities.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
 
 import java.util.HashMap;
 import java.util.List;

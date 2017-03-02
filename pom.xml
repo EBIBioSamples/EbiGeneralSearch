@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>uk.ac.ebi.spot.biosamples</groupId>
-	<artifactId>ebi_general_search</artifactId>
+	<artifactId>biosamples-ebi-general-search</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 

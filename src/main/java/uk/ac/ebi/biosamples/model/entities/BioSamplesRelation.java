@@ -1,18 +1,9 @@
-package uk.ac.ebi.biosamples.model.relations;
+package uk.ac.ebi.biosamples.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 public class BioSamplesRelation {
-//    private String accession;
-//
-//    public String getAccession() {
-//        return accession;
-//    }
-//
-//    public void setAccession(String accession) {
-//        this.accession = accession;
-//    }
     private String identifier;
 
     @JsonGetter("accession")
@@ -32,9 +23,4 @@ public class BioSamplesRelation {
         }
     }
 
-
-//    @Override
-//    public String getIdentifier() {
-//        return getAccession();
-//    }
 }

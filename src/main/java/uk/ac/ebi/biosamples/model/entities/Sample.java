@@ -2,8 +2,7 @@ package uk.ac.ebi.biosamples.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import uk.ac.ebi.biosamples.model.relations.BioSamplesRelation;
-import uk.ac.ebi.biosamples.model.relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
 import uk.ac.ebi.biosamples.model.util.CharacteristicsDeserializer;
 
 import java.util.List;

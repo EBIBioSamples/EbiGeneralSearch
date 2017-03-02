@@ -1,7 +1,6 @@
 package uk.ac.ebi.biosamples.model.entities;
 
-import uk.ac.ebi.biosamples.model.relations.BioSamplesRelation;
-import uk.ac.ebi.biosamples.model.relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
 
 import java.util.List;
 import java.util.Map;
