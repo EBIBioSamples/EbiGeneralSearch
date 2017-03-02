@@ -21,7 +21,7 @@ public class Config {
 
     private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 10;
 
-    @Value("${connection.timeout:10}")
+    @Value("${resource.retrieve.connection.timeout:10}")
     int connectionTimeout;
 
     @Bean

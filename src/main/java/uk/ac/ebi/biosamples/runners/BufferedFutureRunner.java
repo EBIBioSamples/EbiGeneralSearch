@@ -26,9 +26,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,8 +46,11 @@ public class BufferedFutureRunner implements ApplicationRunner {
     private ExecutionInfo taskInfo;
 
 
-    @Value("${resource.max.error:10}")
+    @Value("${resource.retrieve.max.error:10}")
     int maxErrorPerResource;
+
+    @Value("${resource.retrieve.threads.count:16}")
+    int threadsCount;
 
     public BufferedFutureRunner(XmlService xmlService,
                        RelationsService relationsService,
@@ -68,32 +68,31 @@ public class BufferedFutureRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        log.debug("Starting BufferedFutureRunner");
+        log.info("EBI General Search exporter started");
 
         RunnerOptions options = RunnerOptions.from(args);
 
-        SamplesResourceService.URIBuilder uriBuilder = samplesResourceService.getURIBuilder(EntityType.SAMPLES);
-        uriBuilder.startAtPage(options.getStartPage()).withPageSize(options.getSize());
+        SamplesResourceService.URIBuilder uriBuilder = samplesResourceService
+                .getURIBuilder(EntityType.SAMPLES)
+                .startAtPage(options.getStartPage())
+                .withPageSize(options.getSize());
         BioSamplesIterator<Sample> bioSamplesIterator = samplesResourceService.getSamplesIterator(uriBuilder.build());
 
 
         Path path = options.getFilename();
         ExecutorService executor = null;
-        Duration maxDuration = Duration.ofMinutes(60);
-        Temporal start = Instant.now();
 
         try {
             writer = initWriter(path);
             writer = startDocument(writer);
-            executor = Executors.newFixedThreadPool(32);
+            executor = Executors.newFixedThreadPool(threadsCount);
 
             // First submission
-            for (int i = 0; i < options.getSize(); i++) {
-                if (bioSamplesIterator.hasNext()) {
-                    Resource<Sample> sample = bioSamplesIterator.next();
-                    submitExpansionTask(sample, executor);
-                    taskInfo.incrementSubmitted(1);
-                }
+            while(bioSamplesIterator.hasNext() && taskInfo.getSubmitted() < options.getSize()) {
+                Resource<Sample> sample = bioSamplesIterator.next();
+                submitExpansionTask(sample, executor);
+                taskInfo.incrementSubmitted(1);
+                log.debug("Submitted {} tasks", taskInfo.getSubmitted());
             }
 
             // Checking for exception queue
@@ -101,22 +100,28 @@ public class BufferedFutureRunner implements ApplicationRunner {
             while(taskInfo.getSubmitted() > taskInfo.getCompleted() + taskInfo.getErrors()) {
                 while (!exceptionQueue.isEmpty()) {
                     Resource<Sample> sample = exceptionQueue.poll();
+                    log.debug("Resubmitting task for sample {}", sample.getContent().getAccession());
                     submitExpansionTask(sample, executor);
                 }
                 Thread.sleep(5000);
             }
+            log.debug("All task finished");
 
             closeDocument(writer);
 
         } catch (XMLStreamException | IOException e) {
             log.error("An error occurred while creating the file", e);
         } finally {
-            log.debug("Operation completed");
             if (writer != null)
                 writer.close();
             if (executor != null && !executor.isShutdown()) {
                 executor.shutdownNow();
             }
+
+            log.info("EBI general search exporter finished");
+            log.info("Total task submitted {}; Total task completed {}; Total task failed {}",
+                    taskInfo.getSubmitted(), taskInfo.getCompleted(), taskInfo.getErrors());
+
 
         }
     }
@@ -174,12 +179,14 @@ public class BufferedFutureRunner implements ApplicationRunner {
     }
 
     private XMLStreamWriter initWriter(Path documentPath) throws XMLStreamException, IOException {
+        log.debug("Initializing XML document");
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         factory.setProperty("escapeCharacters", false);
         return factory.createXMLStreamWriter(new FileWriter(documentPath.toFile()));
     }
 
     private void writeResourceToFile(Resource<Sample> sampleResource, XMLStreamWriter outputWriter) throws XMLStreamException {
+        log.debug("Writing resource {} to XML document", sampleResource.getContent().getAccession());
         Element sampleEntry = xmlService.getEntryForSample(sampleResource.getContent());
         outputWriter.writeCharacters(xmlService.prettyPrint(sampleEntry));
         outputWriter.writeCharacters("\n");
@@ -187,6 +194,7 @@ public class BufferedFutureRunner implements ApplicationRunner {
     }
 
     private XMLStreamWriter startDocument(XMLStreamWriter writer) throws XMLStreamException {
+        log.debug("Started to write the XML document");
         writer.writeStartDocument();
         writer.writeCharacters("\n");
         writer.writeStartElement("database");
@@ -197,8 +205,8 @@ public class BufferedFutureRunner implements ApplicationRunner {
         return writer;
     }
 
-    private XMLStreamWriter closeDocument(XMLStreamWriter writer) throws XMLStreamException
-    {
+    private XMLStreamWriter closeDocument(XMLStreamWriter writer) throws XMLStreamException {
+        log.debug("Closing the XML document");
         writer.writeEndElement();
         writer.writeCharacters("\n");
         SimpleDateFormat dateformat = new SimpleDateFormat("dd-MM-yyyy");
@@ -222,11 +230,11 @@ public class BufferedFutureRunner implements ApplicationRunner {
         writer.writeCharacters("\n");
         writer.writeEndDocument();
         writer.flush();
-        return writer;
-    }
+        log.debug("Finished to write the XML document");
+        writer.close();
+        log.debug("XML Document closed");
 
-    public Duration durationFrom(Temporal start) {
-        return Duration.between(start, Instant.now());
+        return writer;
     }
 
 }

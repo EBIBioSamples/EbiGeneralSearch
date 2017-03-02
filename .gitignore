@@ -26,3 +26,6 @@ nbdist/
 
 ### Spring ###
 *.properties
+
+### Personal ###
+output.xml

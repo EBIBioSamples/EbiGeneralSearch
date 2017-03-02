@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class RunnerOptions {
-    private final int DEFAULT_SIZE = 1000;
+    private final int DEFAULT_SIZE = Integer.MAX_VALUE;
     private final int DEFAULT_PAGE = 0;
     private final Path DEFAULT_FILENAME = Paths.get("./output.xml");
     int size;
