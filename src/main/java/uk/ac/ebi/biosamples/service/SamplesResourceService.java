@@ -6,19 +6,25 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.UriTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uk.ac.ebi.biosamples.model.Entities.Group;
-import uk.ac.ebi.biosamples.model.Entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.model.Entities.Sample;
+import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
+import uk.ac.ebi.biosamples.model.entities.Group;
+import uk.ac.ebi.biosamples.model.entities.Sample;
+import uk.ac.ebi.biosamples.model.enums.EntityType;
+import uk.ac.ebi.biosamples.model.enums.Sort;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Service
 public class SamplesResourceService {
+
 
     @Autowired
     private RestTemplate restTemplate;
@@ -26,8 +32,7 @@ public class SamplesResourceService {
     @Autowired
     private RelationsService relationService;
 
-//    @Value("${biosamples.api.root:'http://www.ebi.ac.uk/biosamples/api'}")
-    @Value("${biosamples.api.root:'https://www.ebi.ac.uk/biosamples/api'}")
+    @Value("${biosamples.api.root:'http://www.ebi.ac.uk/biosamples/api'}")
     private String apiRoot;
 
 
@@ -42,11 +47,6 @@ public class SamplesResourceService {
                 apiRoot, id);
         if (re.getStatusCode().is2xxSuccessful()) {
             return re.getBody();
-//            Resource<Sample> resourceSample = re.getBody();
-//            Sample sample = resourceSample.getContent();
-//            sample.setRelations(relationService.getSampleRelations(sample.getAccession()));
-//            Resource<Sample> extendedResource =
-//                    new Resource<>(sample,resourceSample.getLinks());
         }
         return null;
     }
@@ -61,10 +61,10 @@ public class SamplesResourceService {
         return it;
     }
 
-    public BioSamplesIterator<Sample> getSamplesIterator(String samplesStartingPage) {
+    public BioSamplesIterator<Sample> getSamplesIterator(URI specificUrl) {
         BioSamplesIterator<Sample> it = new BioSamplesIterator<>(restTemplate,
                 relationService,
-                URI.create(samplesStartingPage),
+                specificUrl,
                 new ParameterizedTypeReference<PagedResources<Resource<Sample>>>(){});
         it.initialize();
         return it;
@@ -79,13 +79,63 @@ public class SamplesResourceService {
         return it;
     }
 
-    public BioSamplesIterator<Group> getGroupIterator(String groupsStartingPage) {
+    public BioSamplesIterator<Group> getGroupIterator(URI specificUrl) {
         BioSamplesIterator<Group> it = new BioSamplesIterator<>(restTemplate,
                 relationService,
-                URI.create(groupsStartingPage),
+                specificUrl,
                 new ParameterizedTypeReference<PagedResources<Resource<Group>>>() {});
         it.initialize();
         return it;
+    }
+
+    public URIBuilder getURIBuilder(EntityType type) {
+        return new URIBuilder(apiRoot, type);
+    }
+
+
+    public static class URIBuilder {
+
+        private final int DEFAULT_STARTING_PAGE = 0;
+        private final int DEFAULT_PAGE_SIZE = 50;
+        private final Sort DEFAULT_SORT = Sort.ASCENDING;
+
+        private Sort sortMethod;
+        private int startingPage;
+        private int pageSize;
+        private EntityType entityType;
+        private String apiRoot;
+
+        URIBuilder(String apiRoot, EntityType type) {
+           startingPage = DEFAULT_STARTING_PAGE;
+           pageSize = DEFAULT_PAGE_SIZE;
+           sortMethod = DEFAULT_SORT;
+           this.entityType = type;
+           this.apiRoot = apiRoot;
+       }
+
+       public URIBuilder startAtPage(int startPage) {
+           this.startingPage = startPage;
+           return this;
+       }
+
+       public URIBuilder withPageSize(int pageSize) {
+           this.pageSize = pageSize;
+           return this;
+       }
+
+       public URIBuilder setSort(Sort sortMethod) {
+           this.sortMethod = sortMethod;
+           return this;
+       }
+
+       public URI build() {
+           Map<String, Object> parameters = new HashMap<>();
+           parameters.put("page", this.startingPage);
+           parameters.put("size", this.pageSize);
+           parameters.put("sort", this.sortMethod.getType());
+           parameters.put("entity", this.entityType.getType());
+           return new UriTemplate(apiRoot + "/{entity}?page={page}&size={size}&sort={sort}").expand(parameters);
+       }
     }
 
 

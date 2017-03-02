@@ -1,6 +1,6 @@
 biosamples.api.page.size = 50
 biosamples.api.root      = https://www.ebi.ac.uk/biosamples/api
 
-### EBI search specific options
-# Size of the single XML document exported
-ebi.search.page.size     = 1000
+# Error handling information
+resource.max.error       = 2
+

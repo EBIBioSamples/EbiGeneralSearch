@@ -1,11 +1,8 @@
-package uk.ac.ebi.biosamples.model.Entities;
+package uk.ac.ebi.biosamples.model.entities;
 
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by lucacherubin on 2016/11/07.
- */
 public class BioSamplesCharacteristic {
 
     String type;

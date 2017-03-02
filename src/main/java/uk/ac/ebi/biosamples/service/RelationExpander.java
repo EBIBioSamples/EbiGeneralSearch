@@ -1,8 +1,8 @@
 package uk.ac.ebi.biosamples.service;
 
-import uk.ac.ebi.biosamples.model.Entities.Group;
-import uk.ac.ebi.biosamples.model.Entities.BioSamplesEntity;
-import uk.ac.ebi.biosamples.model.Entities.Sample;
+import uk.ac.ebi.biosamples.model.entities.Group;
+import uk.ac.ebi.biosamples.model.entities.BioSamplesEntity;
+import uk.ac.ebi.biosamples.model.entities.Sample;
 
 import java.util.concurrent.Callable;
 

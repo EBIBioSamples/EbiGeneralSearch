@@ -6,11 +6,11 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.biosamples.model.Entities.BioSamplesCharacteristic;
-import uk.ac.ebi.biosamples.model.Entities.Group;
-import uk.ac.ebi.biosamples.model.Entities.Sample;
-import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelation;
-import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.model.entities.BioSamplesCharacteristic;
+import uk.ac.ebi.biosamples.model.entities.Group;
+import uk.ac.ebi.biosamples.model.entities.Sample;
+import uk.ac.ebi.biosamples.model.relations.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.relations.BioSamplesRelationType;
 
 import java.text.SimpleDateFormat;
 import java.util.*;

@@ -4,15 +4,14 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.hateoas.Resource;
 import uk.ac.ebi.biosamples.Application;
-import uk.ac.ebi.biosamples.model.Entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.model.Entities.Sample;
-import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelation;
-import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
+import uk.ac.ebi.biosamples.model.entities.Sample;
+import uk.ac.ebi.biosamples.model.relations.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.relations.BioSamplesRelationType;
 import uk.ac.ebi.biosamples.service.RelationsService;
 import uk.ac.ebi.biosamples.service.SamplesResourceService;
 import uk.ac.ebi.biosamples.service.XmlService;
@@ -31,22 +30,26 @@ import java.util.stream.Collectors;
 public class QueueRunner implements CommandLineRunner{
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
-
-    @Autowired
-    private RelationsService relationsService;
-
-    @Autowired
-    private SamplesResourceService samplesResourceService;
-
-    @Autowired
-    private XmlService xmlService;
-
     @Value("${ebi.search.page.size:100}")
     private int entitiesPerFile;
-
     private int currentFileNumber;
+
+    private XmlService xmlService;
+    private SamplesResourceService samplesResourceService;
+    private RelationsService relationsService;
+
+    public QueueRunner(XmlService xmlService,
+                             RelationsService relationsService,
+                             SamplesResourceService samplesService)
+    {
+        this.relationsService = relationsService;
+        this.xmlService = xmlService;
+        this.samplesResourceService = samplesService;
+    }
     @Override
     public void run(String... strings) throws Exception {
+
+        log.info("Starting QueueRunner");
 
         BioSamplesIterator<Sample> bioSamplesIterator = samplesResourceService.getSamplesIterator();
         int currentlyDone = 0;

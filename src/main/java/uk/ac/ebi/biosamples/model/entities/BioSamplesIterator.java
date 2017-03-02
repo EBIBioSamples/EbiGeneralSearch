@@ -1,4 +1,4 @@
-package uk.ac.ebi.biosamples.model.Entities;
+package uk.ac.ebi.biosamples.model.entities;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.PagedResources;
@@ -32,8 +32,8 @@ public class BioSamplesIterator<E extends BioSamplesEntity> implements Iterator<
                               URI baseUrl,
                               ParameterizedTypeReference<PagedResources<Resource<E>>> type) {
 
-        assert(baseUrl != null);
-        assert(restTemplate != null);
+        assert (baseUrl != null);
+        assert (restTemplate != null);
         this.restTemplate = restTemplate;
         this.baseUrl = baseUrl;
         this.parameterizedTypeReference = type;
@@ -41,7 +41,7 @@ public class BioSamplesIterator<E extends BioSamplesEntity> implements Iterator<
         this.relationsService = relationsService;
     }
 
-    public void initialize() throws HttpStatusCodeException, UnsupportedOperationException{
+    public void initialize() throws HttpStatusCodeException, UnsupportedOperationException {
         this.updateStatusWith(baseUrl);
         this.initialized = true;
     }
@@ -61,8 +61,8 @@ public class BioSamplesIterator<E extends BioSamplesEntity> implements Iterator<
         if (statusCode.is2xxSuccessful()) {
             return re.getBody();
         } else {
-            if(statusCode.is4xxClientError()) throw new HttpClientErrorException(statusCode);
-            else if(statusCode.is5xxServerError()) throw new HttpServerErrorException(statusCode);
+            if (statusCode.is4xxClientError()) throw new HttpClientErrorException(statusCode);
+            else if (statusCode.is5xxServerError()) throw new HttpServerErrorException(statusCode);
             else throw new UnsupportedOperationException();
         }
     }
@@ -70,7 +70,7 @@ public class BioSamplesIterator<E extends BioSamplesEntity> implements Iterator<
 
     @Override
     public boolean hasNext() {
-        if(!this.initialized) {
+        if (!this.initialized) {
             this.initialize();
         }
         return this.currentCollectionIterator.hasNext() || this.currentPage.hasLink("next");
@@ -79,7 +79,7 @@ public class BioSamplesIterator<E extends BioSamplesEntity> implements Iterator<
     @Override
     public Resource<E> next() {
 
-        if(!initialized) {
+        if (!initialized) {
             this.initialize();
         }
 
@@ -99,27 +99,6 @@ public class BioSamplesIterator<E extends BioSamplesEntity> implements Iterator<
     public PagedResources<Resource<E>> getStatus() {
         return this.currentPage;
     }
-
-//    public Resource<E> getExtendedResource(Resource<E> originalResource) {
-//        E content = originalResource.getContent();
-//        Map<BioSamplesRelationType, List<Relation>> relations = null;
-//        if (content.getEntityType().equals(Group.class)) {
-//            relations = relationsService.getGroupsRelations(content.getAccession());
-//        } else if (content.getEntityType().equals(Sample.class)) {
-//            relations = relationsService.getSampleRelations(content.getAccession());
-//        }
-//
-//        if(relations  != null) {
-//           content.setRelations(relations);
-//           return new Resource<>(content,originalResource.getLinks());
-//        } else {
-//            return originalResource;
-//        }
-//
-//
-//
-//    }
-
 
 
 }

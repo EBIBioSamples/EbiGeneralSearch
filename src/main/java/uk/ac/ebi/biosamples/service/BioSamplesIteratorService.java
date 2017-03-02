@@ -7,9 +7,9 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uk.ac.ebi.biosamples.model.Entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.model.Entities.Group;
-import uk.ac.ebi.biosamples.model.Entities.Sample;
+import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
+import uk.ac.ebi.biosamples.model.entities.Group;
+import uk.ac.ebi.biosamples.model.entities.Sample;
 
 import java.net.URI;
 

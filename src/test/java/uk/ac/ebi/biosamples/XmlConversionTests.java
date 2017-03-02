@@ -17,7 +17,7 @@ import org.xmlunit.builder.Input;
 import org.xmlunit.diff.ElementSelector;
 import org.xmlunit.xpath.JAXPXPathEngine;
 import org.xmlunit.xpath.XPathEngine;
-import uk.ac.ebi.biosamples.model.Entities.Sample;
+import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.service.BioSamplesIteratorService;
 import uk.ac.ebi.biosamples.service.SamplesResourceService;
 import uk.ac.ebi.biosamples.service.XmlService;

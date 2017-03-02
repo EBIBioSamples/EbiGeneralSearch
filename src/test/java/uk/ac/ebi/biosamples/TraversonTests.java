@@ -10,7 +10,7 @@ import org.springframework.hateoas.UriTemplate;
 import org.springframework.hateoas.client.Traverson;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.relations.BioSamplesRelation;
 
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -34,7 +34,7 @@ public class TraversonTests {
         Traverson traverson = new Traverson(template.expand(parameters), MediaTypes.HAL_JSON);
         ParameterizedTypeReference<Resources<BioSamplesRelation>> rel = new ParameterizedTypeReference<Resources<BioSamplesRelation>>() {};
         Resources<BioSamplesRelation> relations = traverson.follow("relations","derivedFrom").toObject(rel);
-        assertNotNull("Relations should not be null", relations);
+        assertNotNull("relations should not be null", relations);
         assertThat(relations.getContent().size()).isEqualTo(1).withFailMessage("Derived from size should be 1");
         BioSamplesRelation content = relations.getContent().stream().findFirst().get();
         assertThat(content.getRelationIdentifier()).isEqualTo("SAMEA2590957").withFailMessage("Derived from sample should have accession SAMEA2590957");

@@ -5,13 +5,11 @@ import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.Resource;
-import org.springframework.stereotype.Component;
-import uk.ac.ebi.biosamples.model.Entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.model.Entities.Sample;
-import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelation;
-import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
+import uk.ac.ebi.biosamples.model.entities.Sample;
+import uk.ac.ebi.biosamples.model.relations.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.relations.BioSamplesRelationType;
 import uk.ac.ebi.biosamples.service.RelationsService;
 import uk.ac.ebi.biosamples.service.SamplesResourceService;
 import uk.ac.ebi.biosamples.service.XmlService;
@@ -32,8 +30,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Component
-@Order
+//@Component
+//@Order
 public class FixedLengthRunner implements CommandLineRunner {
 
     private Logger log = LoggerFactory.getLogger(FixedLengthRunner.class);

@@ -1,4 +1,4 @@
-package uk.ac.ebi.biosamples.model.Relations;
+package uk.ac.ebi.biosamples.model.relations;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;

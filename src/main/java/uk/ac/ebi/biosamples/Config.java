@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class Config {
 
-    private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 100;
+    private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 10;
 
     @Bean
     MappingJackson2HttpMessageConverter createHalConverter() {
@@ -50,18 +50,18 @@ public class Config {
     public HttpClient httpClient() {
 
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        int timeout = 10;
+        connectionManager.setMaxTotal(DEFAULT_MAX_TOTAL_CONNECTIONS);
+        int timeout = 5;
         RequestConfig config = RequestConfig.custom()
                 .setConnectTimeout(timeout * 1000)
                 .setConnectionRequestTimeout(timeout * 1000)
                 .setSocketTimeout(timeout * 1000).build();
 
         HttpClient defaultHttpClient = HttpClientBuilder.create()
-                .setConnectionManager(connectionManager)
+//                .setConnectionManager(connectionManager)
                 .setDefaultRequestConfig(config)
                 .build();
 
-        connectionManager.setMaxTotal(DEFAULT_MAX_TOTAL_CONNECTIONS);
         return defaultHttpClient;
     }
 

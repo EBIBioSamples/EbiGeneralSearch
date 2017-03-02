@@ -7,10 +7,11 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.hateoas.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.biosamples.model.Entities.Group;
-import uk.ac.ebi.biosamples.model.Entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.model.Entities.Sample;
-import uk.ac.ebi.biosamples.service.BioSamplesIteratorService;
+import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
+import uk.ac.ebi.biosamples.model.entities.Group;
+import uk.ac.ebi.biosamples.model.entities.Sample;
+import uk.ac.ebi.biosamples.model.enums.EntityType;
+import uk.ac.ebi.biosamples.service.SamplesResourceService;
 
 import java.util.List;
 import java.util.Set;
@@ -25,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BioSamplesIteratorTests {
 
     @Autowired
-    private BioSamplesIteratorService service;
+    private SamplesResourceService service;
 
     @Test
     public void getFirstSamplesPage() {
@@ -35,7 +36,11 @@ public class BioSamplesIteratorTests {
 
     @Test
     public void getLastSamplesPage() {
-        BioSamplesIterator<Sample> lastPageIterator = service.getSamplesIterator("https://www.ebi.ac.uk/biosamples/api/samples?page=106771&size=50");
+        SamplesResourceService.URIBuilder builder = service
+                .getURIBuilder(EntityType.SAMPLES)
+                .startAtPage(106771)
+                .withPageSize(50);
+        BioSamplesIterator<Sample> lastPageIterator = service.getSamplesIterator(builder.build());
         assertThat(!lastPageIterator.getStatus().hasLink("next")).withFailMessage("Last sample page should not have a next page");
     }
 
@@ -85,31 +90,14 @@ public class BioSamplesIteratorTests {
 
     }
 
-//    @Test
-//    public void getFirstSamplesPage() {
-//        BioSamplesIterator<Sample> it = service.getSamplesIterator();
-//        assertThat(!it.getStatus().hasLink("prev")).withFailMessage("First sample page should not have a prev page");
-//    }
-//
-//    @Test
-//    public void getLastSamplesPage() {
-//        BioSamplesIterator<Sample> lastPageIterator = service.getSamplesIterator("https://www.ebi.ac.uk/biosamples/api/samples?page=106771&size=50");
-//        assertThat(!lastPageIterator.getStatus().hasLink("next")).withFailMessage("Last sample page should not have a next page");
-//    }
-//
-//    @Test
-//    public void getTenSamples() {
-//        BioSamplesIterator<Sample> it = service.getSamplesIterator();
-//        List<Resource<Sample>> samples = Stream.generate(it::next).limit(10).collect(Collectors.toList());
-//        assertThat(samples).hasSize(10);
-//
-//    }
-//
-//    @Test
-//    public void getHundredSamples() {
-//        BioSamplesIterator<Sample> it = service.getSamplesIterator();
-//        List<Resource<Sample>> samples = Stream.generate(it::next).limit(100).collect(Collectors.toList());
-//        assertThat(samples).hasSize(100);
-//    }
-//
+    @Test
+    public void checkCorrectPage() {
+        SamplesResourceService.URIBuilder builder = service
+                .getURIBuilder(EntityType.SAMPLES)
+                .startAtPage(1);
+        BioSamplesIterator<Sample> it  = service.getSamplesIterator(builder.build());
+        assertThat(it.getStatus().getMetadata().getNumber()).isEqualTo(1);
+    }
+
+
 }

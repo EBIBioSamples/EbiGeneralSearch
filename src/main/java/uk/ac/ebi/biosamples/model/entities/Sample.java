@@ -1,10 +1,10 @@
-package uk.ac.ebi.biosamples.model.Entities;
+package uk.ac.ebi.biosamples.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelation;
-import uk.ac.ebi.biosamples.model.Relations.BioSamplesRelationType;
-import uk.ac.ebi.biosamples.model.Util.CharacteristicsDeserializer;
+import uk.ac.ebi.biosamples.model.relations.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.relations.BioSamplesRelationType;
+import uk.ac.ebi.biosamples.model.util.CharacteristicsDeserializer;
 
 import java.util.List;
 import java.util.Map;
