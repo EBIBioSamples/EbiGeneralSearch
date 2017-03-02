@@ -182,6 +182,7 @@ public class BufferedFutureRunner implements ApplicationRunner {
     private void writeResourceToFile(Resource<Sample> sampleResource, XMLStreamWriter outputWriter) throws XMLStreamException {
         Element sampleEntry = xmlService.getEntryForSample(sampleResource.getContent());
         outputWriter.writeCharacters(xmlService.prettyPrint(sampleEntry));
+        outputWriter.writeCharacters("\n");
         outputWriter.flush();
     }
 
