@@ -98,6 +98,9 @@ public class NoRelationsBufferedFutureRunner implements ApplicationRunner {
                 }
                 taskInfo.incrementSubmitted(1);
                 log.debug("Submitted {} tasks", taskInfo.getSubmitted());
+                if (taskInfo.getSubmitted() % 1000 == 0) {
+                    log.info("Successfully submitted {} tasks so far", taskInfo.getSubmitted());
+                }
             }
 
             // Checking for exception queue
