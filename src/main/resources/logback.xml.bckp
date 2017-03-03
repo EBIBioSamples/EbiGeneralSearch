@@ -5,7 +5,7 @@
 
     <appender name="CUSTOM_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${logging.basepath}${logging.basename}.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${logging.path}${logging.basename}.%d{yyyy-MM-dd}.log</FileNamePattern>
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
         <encoder>
@@ -15,7 +15,7 @@
 
     <logger name="uk.ac.ebi.biosamples.runners.BufferedFutureRunner" level="debug" />
 
-    <root level="${logging.level.root}">
+    <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="CUSTOM_FILE" />
     </root>
