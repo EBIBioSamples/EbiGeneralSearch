@@ -86,7 +86,7 @@ public class NoRelationsBufferedFutureRunner implements ApplicationRunner {
             executor = Executors.newFixedThreadPool(threadsCount);
 
             // First submission
-            while(bioSamplesIterator.hasNext() && taskInfo.getSubmitted() < options.getSize()) {
+            while(bioSamplesIterator.hasNext() && taskInfo.getSubmitted() < options.getTotal()) {
                 Resource<Sample> sample = bioSamplesIterator.next();
                 try {
                     writeResourceToFile(sample, writer);
