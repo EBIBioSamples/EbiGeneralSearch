@@ -110,15 +110,17 @@ public class XmlService {
             additionalFields.addContent(field);
         }
 
-        for (Map.Entry<BioSamplesRelationType, List<BioSamplesRelation>> mapEntry: sample.getRelations().entrySet()) {
+        if (sample.getRelations() != null) {
+            for (Map.Entry<BioSamplesRelationType, List<BioSamplesRelation>> mapEntry : sample.getRelations().entrySet()) {
 
-            if (mapEntry.getKey().equals(BioSamplesRelationType.GROUPS)) continue;
+                if (mapEntry.getKey().equals(BioSamplesRelationType.GROUPS)) continue;
 
-            for(BioSamplesRelation rel: mapEntry.getValue()) {
-                Element field = new Element("field");
-                field.setAttribute(new Attribute("name", camelToSnakeCase(mapEntry.getKey().getRelationName())));
-                field.addContent(rel.getRelationIdentifier());
-                additionalFields.addContent(field);
+                for (BioSamplesRelation rel : mapEntry.getValue()) {
+                    Element field = new Element("field");
+                    field.setAttribute(new Attribute("name", camelToSnakeCase(mapEntry.getKey().getRelationName())));
+                    field.addContent(rel.getRelationIdentifier());
+                    additionalFields.addContent(field);
+                }
             }
         }
 
@@ -156,25 +158,27 @@ public class XmlService {
     private List<Element> getSampleRelations(Sample sample) {
         Map<BioSamplesRelationType, List<BioSamplesRelation>> relations = sample.getRelations();
         List<Element> sampleRelations = new ArrayList<>();
-        relations.entrySet().forEach(entry -> {
+        if (relations != null) {
+            relations.entrySet().forEach(entry -> {
 
-            List<Element> tempRelations = entry.getValue().stream().map(rel -> {
-                Element relation = new Element("ref");
-                switch(entry.getKey()) {
-                    case EXTERNAL_LINKS:
-                        break;
-                    case GROUPS:
-                        relation.setAttribute("dbName", "GROUPS");
-                        relation.setAttribute("dbkey", rel.getRelationIdentifier());
-                        break;
-                    default:
-                        relation.setAttribute("dbName", "SAMPLES");
-                        relation.setAttribute("dbkey", rel.getRelationIdentifier());
-                }
-                return relation;
-            }).collect(Collectors.toList());
-            sampleRelations.addAll(tempRelations);
-        });
+                List<Element> tempRelations = entry.getValue().stream().map(rel -> {
+                    Element relation = new Element("ref");
+                    switch (entry.getKey()) {
+                        case EXTERNAL_LINKS:
+                            break;
+                        case GROUPS:
+                            relation.setAttribute("dbName", "GROUPS");
+                            relation.setAttribute("dbkey", rel.getRelationIdentifier());
+                            break;
+                        default:
+                            relation.setAttribute("dbName", "SAMPLES");
+                            relation.setAttribute("dbkey", rel.getRelationIdentifier());
+                    }
+                    return relation;
+                }).collect(Collectors.toList());
+                sampleRelations.addAll(tempRelations);
+            });
+        }
         return sampleRelations;
     }
 

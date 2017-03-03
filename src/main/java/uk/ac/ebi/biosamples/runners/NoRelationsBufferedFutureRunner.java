@@ -7,10 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.hateoas.Resource;
+import org.springframework.stereotype.Component;
 import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.model.entities.BioSamplesRelation;
 import uk.ac.ebi.biosamples.model.entities.Sample;
-import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
 import uk.ac.ebi.biosamples.model.enums.EntityType;
 import uk.ac.ebi.biosamples.model.util.ExecutionInfo;
 import uk.ac.ebi.biosamples.model.util.RunnerOptions;
@@ -28,12 +27,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-//@Component
-public class BufferedFutureRunner implements ApplicationRunner {
+@SuppressWarnings("Duplicates")
+@Component
+public class NoRelationsBufferedFutureRunner implements ApplicationRunner {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private XmlService xmlService;
@@ -51,9 +50,9 @@ public class BufferedFutureRunner implements ApplicationRunner {
     @Value("${resource.retrieve.threads.count:16}")
     int threadsCount;
 
-    public BufferedFutureRunner(XmlService xmlService,
-                       RelationsService relationsService,
-                       SamplesResourceService samplesService)
+    public NoRelationsBufferedFutureRunner(XmlService xmlService,
+                                           RelationsService relationsService,
+                                           SamplesResourceService samplesService)
     {
         this.relationsService = relationsService;
         this.xmlService = xmlService;
@@ -67,7 +66,7 @@ public class BufferedFutureRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        log.info("EBI General Search exporter started");
+        log.info("EBI General Search exporter started - Runner: {}", this.getClass().toGenericString());
 
         RunnerOptions options = RunnerOptions.from(args);
 
@@ -89,23 +88,20 @@ public class BufferedFutureRunner implements ApplicationRunner {
             // First submission
             while(bioSamplesIterator.hasNext() && taskInfo.getSubmitted() < options.getSize()) {
                 Resource<Sample> sample = bioSamplesIterator.next();
-                submitExpansionTask(sample, executor);
+                try {
+                    writeResourceToFile(sample, writer);
+                    taskInfo.incrementCompleted(1);
+                } catch (XMLStreamException e) {
+                    log.error("An error occured while writing {} to file",
+                            sample.getContent().getAccession(),
+                            e);
+                }
                 taskInfo.incrementSubmitted(1);
                 log.debug("Submitted {} tasks", taskInfo.getSubmitted());
             }
 
             // Checking for exception queue
-
-            while(taskInfo.getSubmitted() > taskInfo.getCompleted() + taskInfo.getErrors()) {
-                while (!exceptionQueue.isEmpty()) {
-                    Resource<Sample> sample = exceptionQueue.poll();
-                    log.debug("Resubmitting task for sample {}", sample.getContent().getAccession());
-                    submitExpansionTask(sample, executor);
-                }
-                Thread.sleep(5000);
-            }
             log.debug("All task finished");
-
             closeDocument(writer);
 
         } catch (XMLStreamException | IOException e) {
@@ -123,58 +119,6 @@ public class BufferedFutureRunner implements ApplicationRunner {
 
 
         }
-    }
-
-    private CompletableFuture<Resource<Sample>> submitExpansionTask(Resource<Sample> sample, Executor executor) {
-        return CompletableFuture.supplyAsync(() -> {
-            log.debug("Retrieving relations for sample " + sample.getContent().getAccession());
-            Map<BioSamplesRelationType, List<BioSamplesRelation>> allRelation = relationsService.getAllRelations(sample.getContent().getAccession(), Sample.class);
-            return expandSample(sample, allRelation);
-        }, executor).handle((sampleResource,t) -> {
-            if (t == null) {
-                try {
-                    writeResourceToFile(sampleResource, writer);
-                    return null;
-                } catch (XMLStreamException e) {
-                    log.error("An error occured while writing {} to file",
-                            sampleResource.getContent().getAccession(),
-                            e);
-                }
-            }
-            return sample;
-        }).whenComplete((sampleError, throwable) -> {
-            if (sampleError != null || throwable != null) {
-                try {
-                    log.error(String.format("There was an error while expanding sample %s",sampleError.getContent().getAccession()), throwable);
-                    if (!exceptionMap.containsKey(sampleError)) {
-                        exceptionMap.put(sampleError, new AtomicInteger(0));
-                    }
-                    int nErr = exceptionMap.get(sampleError).incrementAndGet();
-                    log.debug("Resource {} has failed {} times", sampleError.getContent().getAccession(), nErr);
-                    if (nErr > maxErrorPerResource) {
-                        // If we can't retrieve the sample resource, add an error
-                        log.error("Too many errors for resource {}, skipping it", sampleError.getContent().getAccession());
-                        taskInfo.incrementError(1);
-                        log.debug("Errors occurred {}", taskInfo.getErrors());
-                    } else {
-                        log.debug("Putting resource {} in the exception queue", sampleError.getContent().getAccession());
-                        exceptionQueue.put(sampleError);
-                    }
-
-                } catch (InterruptedException e) {
-                    log.error("An error occurred while adding sample to exception queue", e);
-                }
-            } else {
-                taskInfo.incrementCompleted(1);
-                log.debug("Completed {} tasks", taskInfo.getCompleted());
-            }
-        });
-    }
-
-    private Resource<Sample> expandSample(Resource<Sample> sample, Map<BioSamplesRelationType, List<BioSamplesRelation>> relation) {
-        log.debug("Expanding sample " + sample.getContent().getAccession());
-        sample.getContent().setRelations(relation);
-        return sample;
     }
 
     private XMLStreamWriter initWriter(Path documentPath) throws XMLStreamException, IOException {
