@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.hateoas.Resource;
-import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
 import uk.ac.ebi.biosamples.model.entities.BioSamplesRelation;
 import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
@@ -25,10 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -75,7 +71,7 @@ public class BufferedFutureRunner implements ApplicationRunner {
                 .getURIBuilder(EntityType.SAMPLES)
                 .startAtPage(options.getStartPage())
                 .withPageSize(options.getSize());
-        BioSamplesIterator<Sample> bioSamplesIterator = samplesResourceService.getSamplesIterator(uriBuilder.build());
+        Iterator<Resource<Sample>> pagedResourceIterator = samplesResourceService.getSamplesIterator(uriBuilder.build());
 
 
         Path path = options.getFilename();
@@ -87,8 +83,8 @@ public class BufferedFutureRunner implements ApplicationRunner {
             executor = Executors.newFixedThreadPool(threadsCount);
 
             // First submission
-            while(bioSamplesIterator.hasNext() && taskInfo.getSubmitted() < options.getSize()) {
-                Resource<Sample> sample = bioSamplesIterator.next();
+            while(pagedResourceIterator.hasNext() && taskInfo.getSubmitted() < options.getSize()) {
+                Resource<Sample> sample = pagedResourceIterator.next();
                 submitExpansionTask(sample, executor);
                 taskInfo.incrementSubmitted(1);
                 log.debug("Submitted {} tasks", taskInfo.getSubmitted());

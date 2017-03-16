@@ -11,14 +11,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
 import uk.ac.ebi.biosamples.model.entities.Group;
 import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.enums.EntityType;
 import uk.ac.ebi.biosamples.model.enums.Sort;
+import uk.ac.ebi.biosamples.model.util.PagedResourceIterator;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 
@@ -51,40 +52,35 @@ public class SamplesResourceService {
         return null;
     }
 
-    public BioSamplesIterator<Sample> getSamplesIterator() {
+    public Iterator<Resource<Sample>> getSamplesIterator() {
 
-        BioSamplesIterator<Sample> it = new BioSamplesIterator<>(restTemplate,
+        PagedResourceIterator<Sample> it = new PagedResourceIterator<>(restTemplate,
                 relationService,
                 URI.create(apiRoot + "/samples/"),
                 new ParameterizedTypeReference<PagedResources<Resource<Sample>>>(){});
-        it.initialize();
         return it;
     }
 
-    public BioSamplesIterator<Sample> getSamplesIterator(URI specificUrl) {
-        BioSamplesIterator<Sample> it = new BioSamplesIterator<>(restTemplate,
+    public Iterator<Resource<Sample>> getSamplesIterator(URI specificUrl) {
+        return new PagedResourceIterator<>(restTemplate,
                 relationService,
                 specificUrl,
                 new ParameterizedTypeReference<PagedResources<Resource<Sample>>>(){});
-        it.initialize();
-        return it;
     }
 
-    public BioSamplesIterator<Group> getGroupIterator() {
-        BioSamplesIterator<Group> it = new BioSamplesIterator<>(restTemplate,
+    public Iterator<Resource<Group>> getGroupIterator() {
+        PagedResourceIterator<Group> it = new PagedResourceIterator<>(restTemplate,
                 relationService,
                 URI.create(apiRoot + "/groups"),
                 new ParameterizedTypeReference<PagedResources<Resource<Group>>>() {});
-        it.initialize();
         return it;
     }
 
-    public BioSamplesIterator<Group> getGroupIterator(URI specificUrl) {
-        BioSamplesIterator<Group> it = new BioSamplesIterator<>(restTemplate,
+    public Iterator<Resource<Group>> getGroupIterator(URI specificUrl) {
+        PagedResourceIterator<Group> it = new PagedResourceIterator<>(restTemplate,
                 relationService,
                 specificUrl,
                 new ParameterizedTypeReference<PagedResources<Resource<Group>>>() {});
-        it.initialize();
         return it;
     }
 

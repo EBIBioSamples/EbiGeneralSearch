@@ -8,7 +8,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
-import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
 import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.enums.EntityType;
 import uk.ac.ebi.biosamples.model.util.ExecutionInfo;
@@ -26,6 +25,7 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -74,7 +74,7 @@ public class NoRelationsBufferedFutureRunner implements ApplicationRunner {
                 .getURIBuilder(EntityType.SAMPLES)
                 .startAtPage(options.getStartPage())
                 .withPageSize(options.getSize());
-        BioSamplesIterator<Sample> bioSamplesIterator = samplesResourceService.getSamplesIterator(uriBuilder.build());
+        Iterator<Resource<Sample>> pagedResourceIterator = samplesResourceService.getSamplesIterator(uriBuilder.build());
 
 
         Path path = options.getFilename();
@@ -86,8 +86,8 @@ public class NoRelationsBufferedFutureRunner implements ApplicationRunner {
             executor = Executors.newFixedThreadPool(threadsCount);
 
             // First submission
-            while(bioSamplesIterator.hasNext() && taskInfo.getSubmitted() < options.getTotal()) {
-                Resource<Sample> sample = bioSamplesIterator.next();
+            while(pagedResourceIterator.hasNext() && taskInfo.getSubmitted() < options.getTotal()) {
+                Resource<Sample> sample = pagedResourceIterator.next();
                 try {
                     writeResourceToFile(sample, writer);
                     taskInfo.incrementCompleted(1);

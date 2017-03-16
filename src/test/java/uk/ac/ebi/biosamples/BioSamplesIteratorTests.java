@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.ConfigFileApplicationContextInitial
 import org.springframework.hateoas.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
+import uk.ac.ebi.biosamples.model.util.PagedResourceIterator;
 import uk.ac.ebi.biosamples.model.entities.Group;
 import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.enums.EntityType;
@@ -31,7 +31,7 @@ public class BioSamplesIteratorTests {
 
     @Test
     public void getFirstSamplesPage() {
-        BioSamplesIterator<Sample> it = service.getSamplesIterator();
+        PagedResourceIterator<Sample> it = (PagedResourceIterator<Sample>) service.getSamplesIterator();
         assertThat(!it.getStatus().hasLink("prev")).withFailMessage("First sample page should not have a prev page");
     }
 
@@ -41,7 +41,7 @@ public class BioSamplesIteratorTests {
                 .getURIBuilder(EntityType.SAMPLES)
                 .startAtPage(10)
                 .withPageSize(50);
-        BioSamplesIterator<Sample> it = service.getSamplesIterator(builder.build());
+        PagedResourceIterator<Sample> it = (PagedResourceIterator<Sample>) service.getSamplesIterator(builder.build());
         assertThat(it.getStatus().getMetadata().getSize()).isEqualTo(50);
         assertThat(it.getStatus().getMetadata().getNumber()).isEqualTo(10);
     }
@@ -52,13 +52,13 @@ public class BioSamplesIteratorTests {
                 .getURIBuilder(EntityType.SAMPLES)
                 .startAtPage(106771)
                 .withPageSize(50);
-        BioSamplesIterator<Sample> lastPageIterator = service.getSamplesIterator(builder.build());
+        PagedResourceIterator<Sample> lastPageIterator = (PagedResourceIterator<Sample>) service.getSamplesIterator(builder.build());
         assertThat(!lastPageIterator.getStatus().hasLink("next")).withFailMessage("Last sample page should not have a next page");
     }
 
     @Test
     public void getTenSamples() {
-        BioSamplesIterator<Sample> it = service.getSamplesIterator();
+        PagedResourceIterator<Sample> it = (PagedResourceIterator<Sample>) service.getSamplesIterator();
         List<Resource<Sample>> samples = Stream.generate(it::next).limit(10).collect(Collectors.toList());
         assertThat(samples).hasSize(10);
 
@@ -66,14 +66,14 @@ public class BioSamplesIteratorTests {
 
     @Test
     public void getHundredSamples() {
-        BioSamplesIterator<Sample> it = service.getSamplesIterator();
+        PagedResourceIterator<Sample> it = (PagedResourceIterator<Sample>) service.getSamplesIterator();
         List<Resource<Sample>> samples = Stream.generate(it::next).limit(100).collect(Collectors.toList());
         assertThat(samples).hasSize(100);
     }
 
     @Test
     public void getDifferentSamples() {
-        BioSamplesIterator<Sample> it = service.getSamplesIterator();
+        PagedResourceIterator<Sample> it = (PagedResourceIterator<Sample>) service.getSamplesIterator();
         List<Resource<Sample>> samples = Stream.generate(it::next)
                 .limit(1000)
                 .collect(Collectors.toList());
@@ -84,7 +84,7 @@ public class BioSamplesIteratorTests {
 
     @Test
     public void groupPageContentNonEmpty() {
-        BioSamplesIterator<Group> it = service.getGroupIterator();
+        PagedResourceIterator<Group> it = (PagedResourceIterator<Group>) service.getGroupIterator();
         Resource<Group> group = it.next();
         assertThat(group).isNotNull().withFailMessage("Resource should not be null");
         assertThat(group.getContent()).isNotNull().withFailMessage("Resource content should not be null");
@@ -92,7 +92,7 @@ public class BioSamplesIteratorTests {
 
     @Test
     public void getDifferentGroups() {
-        BioSamplesIterator<Group> it = service.getGroupIterator();
+        PagedResourceIterator<Group> it = (PagedResourceIterator<Group>) service.getGroupIterator();
         List<Resource<Group>> groups = Stream.generate(it::next)
                 .limit(1000)
                 .collect(Collectors.toList());
@@ -107,7 +107,7 @@ public class BioSamplesIteratorTests {
         SamplesResourceService.URIBuilder builder = service
                 .getURIBuilder(EntityType.SAMPLES)
                 .startAtPage(1);
-        BioSamplesIterator<Sample> it  = service.getSamplesIterator(builder.build());
+        PagedResourceIterator<Sample> it  = (PagedResourceIterator<Sample>) service.getSamplesIterator(builder.build());
         assertThat(it.getStatus().getMetadata().getNumber()).isEqualTo(1);
     }
 
@@ -118,12 +118,12 @@ public class BioSamplesIteratorTests {
                 .getURIBuilder(EntityType.SAMPLES)
                 .startAtPage(0)
                 .withPageSize(1000);
-        BioSamplesIterator<Sample> it = service.getSamplesIterator(builder.build());
+        PagedResourceIterator<Sample> it = (PagedResourceIterator<Sample>) service.getSamplesIterator(builder.build());
 
         builder = service.getURIBuilder(EntityType.SAMPLES)
                          .startAtPage(10)
                          .withPageSize(1000);
-        BioSamplesIterator<Sample> it2 = service.getSamplesIterator(builder.build());
+        PagedResourceIterator<Sample> it2 = (PagedResourceIterator<Sample>) service.getSamplesIterator(builder.build());
         Set accessions1 = Stream.generate(it::next).limit(numToCheck).map(sample -> sample.getContent().getAccession()).collect(Collectors.toSet());
         Set accessions2 = Stream.generate(it2::next).limit(numToCheck).map(sample -> sample.getContent().getAccession()).collect(Collectors.toSet());
         Set intersection = new HashSet<>(accessions1);

@@ -6,9 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.hateoas.Resource;
-import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.entities.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
 import uk.ac.ebi.biosamples.service.RelationsService;
 import uk.ac.ebi.biosamples.service.SamplesResourceService;
@@ -20,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -56,7 +56,7 @@ public class FixedLengthRunner implements CommandLineRunner {
         long startTime = System.currentTimeMillis();
 
 
-        BioSamplesIterator<Sample> iterator = samplesService.getSamplesIterator();
+        Iterator<Resource<Sample>> iterator = samplesService.getSamplesIterator();
         List<Resource<Sample>> samples = Stream.generate(iterator::next).limit(10).collect(Collectors.toList());
         ExecutorService executor = null;
         try {

@@ -8,9 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.hateoas.Resource;
 import uk.ac.ebi.biosamples.Application;
-import uk.ac.ebi.biosamples.model.entities.BioSamplesIterator;
-import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.entities.BioSamplesRelation;
+import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
 import uk.ac.ebi.biosamples.service.RelationsService;
 import uk.ac.ebi.biosamples.service.SamplesResourceService;
@@ -21,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -51,14 +51,14 @@ public class QueueRunner implements CommandLineRunner{
 
         log.info("Starting QueueRunner");
 
-        BioSamplesIterator<Sample> bioSamplesIterator = samplesResourceService.getSamplesIterator();
+        Iterator<Resource<Sample>> pagedResourceIterator = samplesResourceService.getSamplesIterator();
         int currentlyDone = 0;
         currentFileNumber = 0;
         int tempMaximum = 200;
         Executor executor = Executors.newFixedThreadPool(16);
         LinkedBlockingQueue<Resource<Sample>> writingQueue = new LinkedBlockingQueue<>(entitiesPerFile);
-        while(bioSamplesIterator.hasNext() && currentlyDone < tempMaximum) {
-            Resource<Sample> sample = bioSamplesIterator.next();
+        while(pagedResourceIterator.hasNext() && currentlyDone < tempMaximum) {
+            Resource<Sample> sample = pagedResourceIterator.next();
             CompletableFuture<Resource<Sample>> futureSample = CompletableFuture.supplyAsync(() -> {
                 Map<BioSamplesRelationType, List<BioSamplesRelation>> allRelation = relationsService.getAllRelations(sample.getContent().getAccession(), Sample.class);
                 return expandSample(sample, allRelation);
