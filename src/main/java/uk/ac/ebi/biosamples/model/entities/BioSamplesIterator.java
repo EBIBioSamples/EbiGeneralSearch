@@ -85,7 +85,6 @@ public class BioSamplesIterator<E extends BioSamplesEntity> implements Iterator<
 
         if (this.currentCollectionIterator.hasNext()) {
             return this.currentCollectionIterator.next();
-//            return getExtendedResource(nextResource);
         } else {
             if (this.currentPage.hasLink("next")) {
                 updateStatusWith(URI.create(this.currentPage.getNextLink().getHref()));

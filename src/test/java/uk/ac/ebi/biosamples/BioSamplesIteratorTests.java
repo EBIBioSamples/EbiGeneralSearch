@@ -13,6 +13,7 @@ import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.enums.EntityType;
 import uk.ac.ebi.biosamples.service.SamplesResourceService;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,6 +33,17 @@ public class BioSamplesIteratorTests {
     public void getFirstSamplesPage() {
         BioSamplesIterator<Sample> it = service.getSamplesIterator();
         assertThat(!it.getStatus().hasLink("prev")).withFailMessage("First sample page should not have a prev page");
+    }
+
+    @Test
+    public void checkPageSize() {
+        SamplesResourceService.URIBuilder builder = service
+                .getURIBuilder(EntityType.SAMPLES)
+                .startAtPage(10)
+                .withPageSize(50);
+        BioSamplesIterator<Sample> it = service.getSamplesIterator(builder.build());
+        assertThat(it.getStatus().getMetadata().getSize()).isEqualTo(50);
+        assertThat(it.getStatus().getMetadata().getNumber()).isEqualTo(10);
     }
 
     @Test
@@ -97,6 +109,29 @@ public class BioSamplesIteratorTests {
                 .startAtPage(1);
         BioSamplesIterator<Sample> it  = service.getSamplesIterator(builder.build());
         assertThat(it.getStatus().getMetadata().getNumber()).isEqualTo(1);
+    }
+
+    @Test
+    public void checkDifferentPageResults() {
+        int numToCheck = 10000;
+        SamplesResourceService.URIBuilder builder = service
+                .getURIBuilder(EntityType.SAMPLES)
+                .startAtPage(0)
+                .withPageSize(1000);
+        BioSamplesIterator<Sample> it = service.getSamplesIterator(builder.build());
+
+        builder = service.getURIBuilder(EntityType.SAMPLES)
+                         .startAtPage(10)
+                         .withPageSize(1000);
+        BioSamplesIterator<Sample> it2 = service.getSamplesIterator(builder.build());
+        Set accessions1 = Stream.generate(it::next).limit(numToCheck).map(sample -> sample.getContent().getAccession()).collect(Collectors.toSet());
+        Set accessions2 = Stream.generate(it2::next).limit(numToCheck).map(sample -> sample.getContent().getAccession()).collect(Collectors.toSet());
+        Set intersection = new HashSet<>(accessions1);
+        Set union        = new HashSet(accessions1);
+        union.addAll(accessions2);
+        intersection.retainAll(accessions2);
+        assertThat(intersection.isEmpty());
+        assertThat(union.size()).isEqualTo(numToCheck*2);
     }
 
 

@@ -123,8 +123,9 @@ public class XmlService {
                 }
             }
         }
-
-        newEntry.addContent(additionalFields);
+        if (!additionalFields.getContent().isEmpty()) {
+            newEntry.addContent(additionalFields);
+        }
         return newEntry;
     }
 
