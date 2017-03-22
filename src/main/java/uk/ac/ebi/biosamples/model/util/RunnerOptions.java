@@ -23,8 +23,8 @@ public class RunnerOptions {
         this.startPage = args.containsOption("page") ?
                 Integer.parseInt(args.getOptionValues("page").get(0),10) :
                 DEFAULT_PAGE;
-        this.filename = args.containsOption("filename") ?
-                Paths.get(args.getOptionValues("filename").get(0)):
+        this.filename = args.containsOption("outputPath") ?
+                Paths.get(args.getOptionValues("outputPath").get(0)):
                 DEFAULT_FILENAME;
         this.total = args.containsOption("total") ?
                 Integer.parseInt(args.getOptionValues("total").get(0)) :

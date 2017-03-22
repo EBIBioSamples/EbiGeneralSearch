@@ -5,13 +5,20 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.biosamples.model.entities.BioSamplesCharacteristic;
+import uk.ac.ebi.biosamples.model.entities.BioSamplesRelation;
 import uk.ac.ebi.biosamples.model.entities.Group;
 import uk.ac.ebi.biosamples.model.entities.Sample;
-import uk.ac.ebi.biosamples.model.entities.BioSamplesRelation;
 import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
 
+import javax.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -21,6 +28,29 @@ import java.util.stream.Collectors;
 @Service
 public class XmlService {
 
+    @Value("${biosamples.exported.types.file:''}")
+    private String exportedTypesFilename;
+
+    private Set<String> exportedTypes = new HashSet<>();
+    @Autowired
+    ApplicationContext ctx;
+
+    @PostConstruct
+    private void readExportedTypeFile() {
+        if (!exportedTypesFilename.isEmpty()) {
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(exportedTypesFilename));
+                String line = br.readLine();
+                while (line != null) {
+                    exportedTypes.add(line.trim());
+                    line = br.readLine();
+                }
+                br.close();
+            } catch (IOException e) {
+                throw new RuntimeException("Not possible to read the exported types file", e);
+            }
+        }
+    }
 
     public Element getEntryForSample(Sample sample) {
 
@@ -104,10 +134,12 @@ public class XmlService {
         Element additionalFields = new Element("additional_fields");
         List<BioSamplesCharacteristic> characteristics = sample.getCharacteristics();
         for (BioSamplesCharacteristic c : characteristics) {
-            Element field = new Element("field");
-            field.setAttribute(new Attribute("name", camelToSnakeCase(c.getType())));
-            field.addContent(c.getValue());
-            additionalFields.addContent(field);
+            if (exportedTypes.contains(c.getType())) {
+                Element field = new Element("field");
+                field.setAttribute(new Attribute("name", camelToSnakeCase(c.getType())));
+                field.addContent(c.getValue());
+                additionalFields.addContent(field);
+            }
         }
 
         if (sample.getRelations() != null) {
@@ -222,8 +254,13 @@ public class XmlService {
     }
 
     public String prettyPrint(Element e) {
+        XMLOutputter xmlOutput = getXmlPrettyOutputter();
+        return xmlOutput.outputString(e);
+    }
+
+    private XMLOutputter getXmlPrettyOutputter() {
         XMLOutputter xmlOutput = new XMLOutputter();
         xmlOutput.setFormat(Format.getPrettyFormat());
-        return xmlOutput.outputString(e);
+        return xmlOutput;
     }
 }

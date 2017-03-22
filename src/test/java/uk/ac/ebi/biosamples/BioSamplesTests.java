@@ -16,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
 import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.entities.BioSamplesRelation;
-import uk.ac.ebi.biosamples.service.BioSamplesIteratorService;
 import uk.ac.ebi.biosamples.service.RelationsService;
 import uk.ac.ebi.biosamples.service.SamplesResourceService;
 
@@ -38,7 +37,7 @@ public class BioSamplesTests {
     private RestTemplate restTemplate;
 
     @Autowired
-    private BioSamplesIteratorService samplesIteratorService;
+    private SamplesResourceService samplesIteratorService;
 
     @Autowired private SamplesResourceService samplesResourceService;
 

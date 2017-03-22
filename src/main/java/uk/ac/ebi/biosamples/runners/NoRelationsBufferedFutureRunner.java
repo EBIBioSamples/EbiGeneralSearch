@@ -1,6 +1,9 @@
 package uk.ac.ebi.biosamples.runners;
 
 import org.jdom2.Element;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.ParserProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,8 +13,8 @@ import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 import uk.ac.ebi.biosamples.model.entities.Sample;
 import uk.ac.ebi.biosamples.model.enums.EntityType;
+import uk.ac.ebi.biosamples.model.util.CliOptions;
 import uk.ac.ebi.biosamples.model.util.ExecutionInfo;
-import uk.ac.ebi.biosamples.model.util.RunnerOptions;
 import uk.ac.ebi.biosamples.service.RelationsService;
 import uk.ac.ebi.biosamples.service.SamplesResourceService;
 import uk.ac.ebi.biosamples.service.XmlService;
@@ -29,6 +32,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.lang.System.exit;
 
 @SuppressWarnings("Duplicates")
 @Component
@@ -68,16 +73,28 @@ public class NoRelationsBufferedFutureRunner implements ApplicationRunner {
 
         log.info("EBI General Search exporter started - Runner: {}", this.getClass().toGenericString());
 
-        RunnerOptions options = RunnerOptions.from(args);
+        CliOptions options = new CliOptions();
+        ParserProperties props = ParserProperties.defaults().withShowDefaults(false);
+        CmdLineParser parser = new CmdLineParser(options, props);
+        try {
+            parser.parseArgument(args.getSourceArgs());
+            if(options.showHelp()) {
+                parser.printUsage(System.out);
+                exit(0);
+            }
+        } catch (CmdLineException e) {
+            parser.printUsage(System.out);
+            exit(1);
+        }
 
         SamplesResourceService.URIBuilder uriBuilder = samplesResourceService
                 .getURIBuilder(EntityType.SAMPLES)
-                .startAtPage(options.getStartPage())
-                .withPageSize(options.getSize());
+                .startAtPage(options.startPage())
+                .withPageSize(options.pageSize());
         Iterator<Resource<Sample>> pagedResourceIterator = samplesResourceService.getSamplesIterator(uriBuilder.build());
 
 
-        Path path = options.getFilename();
+        Path path = options.outputPath();
         ExecutorService executor = null;
 
         try {
@@ -86,7 +103,7 @@ public class NoRelationsBufferedFutureRunner implements ApplicationRunner {
             executor = Executors.newFixedThreadPool(threadsCount);
 
             // First submission
-            while(pagedResourceIterator.hasNext() && taskInfo.getSubmitted() < options.getTotal()) {
+            while(pagedResourceIterator.hasNext() && taskInfo.getSubmitted() < options.getElementToRetrieve()) {
                 Resource<Sample> sample = pagedResourceIterator.next();
                 try {
                     writeResourceToFile(sample, writer);
@@ -119,8 +136,7 @@ public class NoRelationsBufferedFutureRunner implements ApplicationRunner {
             log.info("EBI general search exporter finished");
             log.info("Total task submitted {}; Total task completed {}; Total task failed {}",
                     taskInfo.getSubmitted(), taskInfo.getCompleted(), taskInfo.getErrors());
-
-
+            
         }
     }
 
