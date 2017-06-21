@@ -1,6 +1,7 @@
 package uk.ac.ebi.biosamples.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import uk.ac.ebi.biosamples.model.enums.BioSamplesRelationType;
 import uk.ac.ebi.biosamples.model.util.CharacteristicsDeserializer;
@@ -53,12 +54,28 @@ public class Sample implements BioSamplesEntity{
         return updateDate;
     }
 
+    @JsonSetter("updateDate")
     public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    @JsonSetter("update")
+    public void setUpdateDateTime(String updateDate) {
         this.updateDate = updateDate;
     }
 
     public String getReleaseDate() {
         return releaseDate;
+    }
+
+    @JsonSetter("releaseDate")
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    @JsonSetter("release")
+    public void setReleaseDateTime(String releaseDate) {
+        this.releaseDate = releaseDate;
     }
 
     @Override
@@ -75,9 +92,6 @@ public class Sample implements BioSamplesEntity{
         this.relations = relations;
     }
 
-    public void setReleaseDate(String releaseDate) {
-        this.releaseDate = releaseDate;
-    }
 
     public List<BioSamplesCharacteristic> getCharacteristics() {
         return characteristics;
